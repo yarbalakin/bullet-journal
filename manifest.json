@@ -2,7 +2,7 @@
   "name": "Bullet Journal",
   "short_name": "BuJo",
   "description": "Твой уютный цифровой дневник",
-  "start_url": "/",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#fdf8f4",
   "theme_color": "#e8a0b0",
