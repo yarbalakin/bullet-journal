@@ -130,6 +130,15 @@ function scheduleSyncToCloud() {
   syncTimer = setTimeout(() => syncToCloud(), 3000);
 }
 
+function showToast(msg, isError) {
+  const el = document.createElement('div');
+  el.textContent = msg;
+  el.style.cssText = `position:fixed;bottom:80px;left:50%;transform:translateX(-50%);padding:8px 18px;border-radius:20px;font-size:13px;z-index:9999;color:#fff;background:${isError ? '#c05050' : '#6a9a6a'};opacity:0;transition:opacity .3s`;
+  document.body.appendChild(el);
+  requestAnimationFrame(() => el.style.opacity = '1');
+  setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, 2500);
+}
+
 async function syncToCloud() {
   try {
     const data = await getAllData();
@@ -140,10 +149,10 @@ async function syncToCloud() {
     });
     const json = await res.json();
     if (json.ok) {
-      console.log('Synced to cloud:', json.timestamp);
+      showToast('Сохранено в облако');
     }
   } catch (e) {
-    console.warn('Cloud sync failed:', e.message);
+    showToast('Ошибка синхронизации', true);
   }
 }
 
