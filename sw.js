@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bujo-v5';
+const CACHE_NAME = 'bujo-v6';
 const ASSETS = [
   './',
   './index.html',
@@ -41,8 +41,8 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // Network-first for API calls, cache-first for assets
-  if (e.request.url.includes('openbeautyfacts.org')) {
+  // Network-first for API calls and CDN, cache-first for assets
+  if (e.request.url.includes('openbeautyfacts.org') || e.request.url.includes('unpkg.com') || e.request.url.includes('n8n.cloud')) {
     e.respondWith(
       fetch(e.request).catch(() => caches.match(e.request))
     );

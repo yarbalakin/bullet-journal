@@ -38,6 +38,16 @@ async function renderHome(container) {
 
   // Get streak data
   const streak = await dbGet('streak', 'main') || { current: 0, longest: 0 };
+  const milestones = [
+    { days: 7,   label: '7 дней',   icon: '&#9733;' },
+    { days: 30,  label: '30 дней',  icon: '&#9733;&#9733;' },
+    { days: 100, label: '100 дней', icon: '&#9733;&#9733;&#9733;' },
+    { days: 365, label: '1 год',    icon: '&#9752;' },
+  ];
+  const badgesHTML = milestones.map(m => {
+    const earned = streak.longest >= m.days;
+    return `<span class="streak-badge ${earned ? 'earned' : ''}" title="${m.label}">${m.icon}</span>`;
+  }).join('');
 
   container.innerHTML = `
     <div class="page-home">
@@ -48,6 +58,7 @@ async function renderHome(container) {
           <span class="streak-count">${streak.current || 0}</span>
         </div>
       </div>
+      ${badgesHTML ? `<div class="streak-badges">${badgesHTML}<span class="streak-best">рекорд: ${streak.longest || 0}</span></div>` : ''}
       <div class="months-grid">
         ${MONTH_NAMES.map((name, i) => {
           const isCurrent = i === currentMonth;

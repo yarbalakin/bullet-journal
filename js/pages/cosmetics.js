@@ -85,6 +85,8 @@ async function renderCosmetics(container) {
   `;
 }
 
+let barcodeScanner = null;
+
 function showAddCosmetic() {
   const content = document.getElementById('content');
   const typeOptions = Object.entries(PAO_DEFAULTS)
@@ -94,9 +96,16 @@ function showAddCosmetic() {
   content.innerHTML = `
     <div class="page-cosmetics">
       <div class="cosm-header">
-        <button class="back-btn" onclick="navigate('cosmetics')">&larr;</button>
+        <button class="back-btn" onclick="stopScanner(); navigate('cosmetics')">&larr;</button>
         <h2>Добавить продукт</h2>
       </div>
+
+      <button class="cosm-scan-btn" onclick="startScanner()">Сканировать штрихкод</button>
+      <div id="scanner-container" class="scanner-container" style="display:none">
+        <div id="scanner-view"></div>
+        <button class="scanner-close-btn" onclick="stopScanner()">Закрыть камеру</button>
+      </div>
+      <div id="scanner-status" class="scanner-status" style="display:none"></div>
 
       <form class="cosm-form" onsubmit="saveCosmetic(event)">
         <label class="form-label">Название
@@ -134,6 +143,73 @@ function showAddCosmetic() {
   updateExpirePreview();
   document.querySelector('[name="openDate"]').addEventListener('change', updateExpirePreview);
   document.querySelector('[name="paoMonths"]').addEventListener('input', updateExpirePreview);
+}
+
+async function startScanner() {
+  const container = document.getElementById('scanner-container');
+  const status = document.getElementById('scanner-status');
+  container.style.display = 'block';
+  status.style.display = 'none';
+
+  try {
+    barcodeScanner = new Html5Qrcode('scanner-view');
+    await barcodeScanner.start(
+      { facingMode: 'environment' },
+      { fps: 10, qrbox: { width: 250, height: 150 }, formatsToSupport: [
+        Html5QrcodeSupportedFormats.EAN_13,
+        Html5QrcodeSupportedFormats.EAN_8,
+        Html5QrcodeSupportedFormats.UPC_A,
+        Html5QrcodeSupportedFormats.UPC_E,
+      ]},
+      onBarcodeScanned,
+      () => {} // ignore errors during scanning
+    );
+  } catch (err) {
+    container.style.display = 'none';
+    status.style.display = 'block';
+    status.textContent = 'Камера недоступна: ' + (err.message || err);
+    status.className = 'scanner-status error';
+  }
+}
+
+function stopScanner() {
+  if (barcodeScanner) {
+    barcodeScanner.stop().catch(() => {});
+    barcodeScanner = null;
+  }
+  const container = document.getElementById('scanner-container');
+  if (container) container.style.display = 'none';
+}
+
+async function onBarcodeScanned(barcode) {
+  stopScanner();
+  const status = document.getElementById('scanner-status');
+  status.style.display = 'block';
+  status.textContent = 'Ищу ' + barcode + '...';
+  status.className = 'scanner-status loading';
+
+  try {
+    const res = await fetch(`https://world.openbeautyfacts.org/api/v2/product/${barcode}.json`);
+    const data = await res.json();
+
+    if (data.status === 1 && data.product) {
+      const p = data.product;
+      const name = p.product_name || p.product_name_ru || '';
+      const brand = p.brands || '';
+
+      if (name) document.querySelector('[name="name"]').value = name;
+      if (brand) document.querySelector('[name="brand"]').value = brand;
+
+      status.textContent = name ? `Найдено: ${name}` : 'Продукт найден, заполни название';
+      status.className = 'scanner-status success';
+    } else {
+      status.textContent = `Штрихкод ${barcode} не найден в базе. Заполни вручную.`;
+      status.className = 'scanner-status warning';
+    }
+  } catch (err) {
+    status.textContent = 'Ошибка поиска. Заполни вручную.';
+    status.className = 'scanner-status error';
+  }
 }
 
 function updatePAO(select) {

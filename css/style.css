@@ -121,6 +121,17 @@ h1, h2 {
 .streak-flame { color: var(--peach); font-size: 16px; }
 .streak-count { font-size: 16px; font-weight: 700; }
 
+.streak-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0 2px;
+  font-size: 14px;
+}
+.streak-badge { opacity: 0.2; }
+.streak-badge.earned { opacity: 1; color: var(--peach); }
+.streak-best { margin-left: auto; font-size: 11px; color: var(--text3); }
+
 .months-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -600,6 +611,49 @@ h1, h2 {
 }
 
 .cosm-delete-btn:active { background: #f8e0e0; }
+
+/* ── SCANNER ── */
+.cosm-scan-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--lavender);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+.cosm-scan-btn:active { opacity: 0.85; }
+.scanner-container {
+  margin-bottom: 16px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: #000;
+}
+#scanner-view { width: 100%; }
+.scanner-close-btn {
+  width: 100%;
+  padding: 10px;
+  background: var(--surface3);
+  border: none;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--text2);
+  cursor: pointer;
+}
+.scanner-status {
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+.scanner-status.loading { background: var(--cream); color: var(--text); }
+.scanner-status.success { background: var(--sage-light); color: #3a6a3a; }
+.scanner-status.warning { background: #fef3cd; color: #856404; }
+.scanner-status.error { background: #f8e0e0; color: #a06060; }
 
 /* ── FORMS ── */
 .form-label {
