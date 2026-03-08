@@ -1032,6 +1032,149 @@ h1, h2 {
 
 .home-pixels-link:active { transform: scale(0.98); background: var(--surface2); }
 
+/* ── COLLECTIONS ── */
+.page-collections { padding-bottom: 40px; }
+
+.coll-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.coll-header h2 { font-size: 28px; }
+
+.coll-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+}
+
+.coll-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.coll-icon { font-size: 18px; }
+
+.coll-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  font-weight: 600;
+  flex: 1;
+}
+
+.coll-done-count {
+  font-size: 12px;
+  color: var(--text3);
+  background: var(--surface3);
+  border-radius: 10px;
+  padding: 2px 8px;
+}
+
+.coll-items { list-style: none; margin-bottom: 10px; }
+
+.coll-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.coll-item:last-child { border-bottom: none; }
+
+.coll-item.done .coll-item-text {
+  text-decoration: line-through;
+  color: var(--text3);
+}
+
+.coll-check {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  border: 1.5px solid var(--border2);
+  background: var(--surface2);
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--sage);
+  transition: all 0.15s;
+}
+
+.coll-check.checked {
+  background: var(--sage-light);
+  border-color: var(--sage);
+}
+
+.coll-item-text { flex: 1; font-size: 14px; }
+
+.coll-done-label {
+  font-size: 10px;
+  color: var(--sage);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.coll-empty {
+  font-size: 13px;
+  color: var(--text3);
+  padding: 4px 0;
+  font-style: italic;
+}
+
+.coll-delete {
+  background: none;
+  border: none;
+  color: var(--text3);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 2px;
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+.coll-delete:hover { opacity: 1; color: #d08080; }
+
+.coll-add {
+  display: flex;
+  gap: 8px;
+}
+
+.coll-input {
+  flex: 1;
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 7px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--surface2);
+  color: var(--text);
+  outline: none;
+}
+
+.coll-input:focus { border-color: var(--pink); }
+
+.coll-add-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: var(--pink);
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
 /* ── FUTURE LOG ── */
 .page-future { padding-bottom: 40px; }
 

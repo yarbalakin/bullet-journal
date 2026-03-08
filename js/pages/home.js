@@ -75,6 +75,9 @@ async function renderHome(container) {
           `;
         }).join('')}
       </div>
+      <div class="home-pixels-link" onclick="navigate('collections')">
+        Коллекции &#8594;
+      </div>
       <div class="home-pixels-link" onclick="navigate('future')">
         Future Log &#8594;
       </div>
