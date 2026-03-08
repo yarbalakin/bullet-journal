@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bullet Journal — Фичи и планы</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fdf8f4;
+    --surface: #fff;
+    --border: #f0e0d4;
+    --text: #3d2f2a;
+    --text2: #7a6860;
+    --text3: #a89890;
+    --pink: #e8a0b0;
+    --pink-light: #fce8ee;
+    --pink-dark: #c07888;
+    --lavender: #b8a0d8;
+    --lavender-light: #ede8f8;
+    --sage: #a8c8a0;
+    --sage-light: #e8f4e6;
+    --peach: #f0c0a0;
+    --cream: #f8e8c8;
+    --shadow: 0 2px 12px rgba(60,30,20,0.06);
+    --radius: 16px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 24px 16px 60px;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  .header {
+    text-align: center;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .header-sub {
+    font-size: 13px;
+    color: var(--text3);
+  }
+
+  .header-link {
+    display: inline-block;
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--pink-dark);
+    text-decoration: none;
+    background: var(--pink-light);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+
+  .section {
+    margin-bottom: 28px;
+  }
+
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-badge {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 10px;
+    padding: 2px 8px;
+  }
+
+  .badge-done { background: var(--sage-light); color: #507048; }
+  .badge-mvp1 { background: var(--lavender-light); color: #7060a8; }
+  .badge-later { background: var(--cream); color: #907040; }
+  .badge-idea { background: var(--pink-light); color: var(--pink-dark); }
+
+  .section-desc {
+    font-size: 12px;
+    color: var(--text3);
+    margin-bottom: 14px;
+    margin-left: 2px;
+  }
+
+  .items {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+
+  .item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .item:last-child { border-bottom: none; }
+  .item:hover { background: #fef9f7; }
+
+  .item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
+    accent-color: var(--pink-dark);
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+
+  .item-body { flex: 1; }
+
+  .item-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.4;
+  }
+
+  .item-desc {
+    font-size: 12px;
+    color: var(--text3);
+    margin-top: 2px;
+    line-height: 1.4;
+  }
+
+  .item.checked .item-name {
+    text-decoration: line-through;
+    color: var(--text3);
+  }
+
+  .item-tag {
+    font-size: 10px;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 2px 6px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    white-space: nowrap;
+  }
+
+  .tag-core { background: var(--cream); color: #907040; }
+  .tag-beauty { background: var(--pink-light); color: var(--pink-dark); }
+  .tag-habit { background: var(--sage-light); color: #507048; }
+  .tag-cloud { background: var(--lavender-light); color: #7060a8; }
+  .tag-pwa { background: #f0f0f0; color: #606060; }
+
+  .notes-area {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow);
+  }
+
+  .notes-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 10px;
+  }
+
+  textarea {
+    width: 100%;
+    border: none;
+    outline: none;
+    resize: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: transparent;
+    line-height: 1.6;
+    min-height: 80px;
+  }
+
+  textarea::placeholder { color: var(--text3); }
+
+  .footer {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 12px;
+    color: var(--text3);
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-title">Bullet Journal</div>
+  <div class="header-sub">Обсудим с Катей — что готово и что добавить?</div>
+  <a class="header-link" href="https://yarbalakin.github.io/bullet-journal/" target="_blank">Открыть приложение &#8594;</a>
+</div>
+
+<!-- ГОТОВО -->
+<div class="section">
+  <div class="section-title">
+    Что уже есть
+    <span class="section-badge badge-done">Готово</span>
+  </div>
+  <div class="section-desc">Всё это уже работает в приложении</div>
+  <div class="items">
+    <label class="item checked">
+      <input type="checkbox" checked>
+      <div class="item-body">
+        <div class="item-name">12 котеджкорных обложек</div>
+        <div class="item-desc">Акварельные иллюстрации для каждого месяца, сгенерированы через AI</div>
+      </div>
+      <span class="item-tag tag-core">Журнал</span>
+    </label>
+    <label class="item checked">
+      <input type="checkbox" checked>
+      <div class="item-body">
+        <div class="item-name">Календарь с цветами настроения</div>
+        <div class="item-desc">Плохо (чёрный), Тревожно (фиолетовый), Грустно (голубой), Спокойно (зелёный), Счастливый день (оранжевый)</div>
+      </div>
+      <span class="item-tag tag-habit">Трекер</span>
+    </label>
+    <label class="item checked">
+      <input type="checkbox" checked>
+      <div class="item-body">
+        <div class="item-name">Year in Pixels</div>
+        <div class="item-desc">Годовая мозаика настроений — весь год на одном экране</div>
+      </div>
+      <span class="item-tag tag-habit">Трекер</span>
+    </label>
+    <label class="item checked">
+      <input type="checkbox" checked>
+      <div class="item-body">
+        <div class="item-name">Задачи по месяцам</div>
+        <div class="item-desc">Список задач с датой или без. Галочка — выполнено, крестик — удалить</div>
+      </div>
+      <span class="item-tag tag-core">Планирование</span>
+    </label>
+    <label class="item checked">
+      <input type="checkbox" checked>
+      <div class="item-body">
+        <div class="item-name">События дня</div>
+        <div class="item-desc">События с временем и цветом. Открываются по нажатию на день в календаре</div>
+      </div>
+      <span class="item-tag tag-core">Планирование</span>
+    </label>
+    <label class="item checked">
+      <input type="checkbox" checked>
+      <div class="item-body">
+        <div class="item-name">Перенос задач (Migration)</div>
+        <div class="item-desc">При открытии нового месяца — предложение перенести незакрытые задачи → или отменить ×</div>
+      </div>
+      <span class="item-tag tag-core">Планирование</span>
+    </label>
+    <label class="item checked">
+      <input type="checkbox" checked>
+      <div class="item-body">
+        <div class="item-name">Future Log</div>
+        <div class="item-desc">Заметки на 6 месяцев вперёд — планы, события, мечты</div>
+      </div>
+      <span class="item-tag tag-core">Планирование</span>
+    </label>
+    <label class="item checked">
+      <input type="checkbox" checked>
+      <div class="item-body">
+        <div class="item-name">Трекер косметики</div>
+        <div class="item-desc">12 типов, PAO-срок годности, цветовой индикатор (зелёный/жёлтый/красный)</div>
+      </div>
+      <span class="item-tag tag-beauty">Красота</span>
+    </label>
+    <label class="item checked">
+      <input type="checkbox" checked>
+      <div class="item-body">
+        <div class="item-name">Сканер штрихкода косметики</div>
+        <div class="item-desc">Навести камеру — название и бренд заполняются автоматически (база Open Beauty Facts)</div>
+      </div>
+      <span class="item-tag tag-beauty">Красота</span>
+    </label>
+    <label class="item checked">
+      <input type="checkbox" checked>
+      <div class="item-body">
+        <div class="item-name">Streak — счётчик дней подряд</div>
+        <div class="item-desc">Бейджи за 7, 30, 100 дней и 1 год. Рекорд сохраняется</div>
+      </div>
+      <span class="item-tag tag-habit">Привычки</span>
+    </label>
+    <label class="item checked">
+      <input type="checkbox" checked>
+      <div class="item-body">
+        <div class="item-name">Облачный бэкап</div>
+        <div class="item-desc">Сохранение и восстановление данных через облако (автоматически при каждом изменении)</div>
+      </div>
+      <span class="item-tag tag-cloud">Облако</span>
+    </label>
+    <label class="item checked">
+      <input type="checkbox" checked>
+      <div class="item-body">
+        <div class="item-name">PWA — устанавливается на телефон</div>
+        <div class="item-desc">Работает как приложение, доступно без интернета</div>
+      </div>
+      <span class="item-tag tag-pwa">PWA</span>
+    </label>
+  </div>
+</div>
+
+<!-- MVP-1 -->
+<div class="section">
+  <div class="section-title">
+    Следующий этап
+    <span class="section-badge badge-mvp1">В планах</span>
+  </div>
+  <div class="section-desc">Что добавим в ближайшее время — расставь приоритеты!</div>
+  <div class="items">
+    <label class="item">
+      <input type="checkbox">
+      <div class="item-body">
+        <div class="item-name">Стикеры для страниц</div>
+        <div class="item-desc">50–100 ботанических акварельных стикеров — цветочки, листики, ягоды</div>
+      </div>
+      <span class="item-tag tag-core">Дизайн</span>
+    </label>
+    <label class="item">
+      <input type="checkbox">
+      <div class="item-body">
+        <div class="item-name">Collections (коллекции)</div>
+        <div class="item-desc">Списки: «Книги для чтения», «Вишлист», «Идеи подарков», «Мысли и заметки»</div>
+      </div>
+      <span class="item-tag tag-core">Журнал</span>
+    </label>
+    <label class="item">
+      <input type="checkbox">
+      <div class="item-body">
+        <div class="item-name">Трекер привычек</div>
+        <div class="item-desc">Сетка привычек за месяц — отмечать каждый день галочкой</div>
+      </div>
+      <span class="item-tag tag-habit">Привычки</span>
+    </label>
+    <label class="item">
+      <input type="checkbox">
+      <div class="item-body">
+        <div class="item-name">Дневник / заметки дня</div>
+        <div class="item-desc">Свободный текст в каждом дне — мысли, впечатления, цитаты</div>
+      </div>
+      <span class="item-tag tag-core">Журнал</span>
+    </label>
+    <label class="item">
+      <input type="checkbox">
+      <div class="item-body">
+        <div class="item-name">Водный баланс</div>
+        <div class="item-desc">Трекер стаканов воды в день — кнопочки +1 стакан</div>
+      </div>
+      <span class="item-tag tag-habit">Здоровье</span>
+    </label>
+    <label class="item">
+      <input type="checkbox">
+      <div class="item-body">
+        <div class="item-name">Финансовый трекер</div>
+        <div class="item-desc">Записывать расходы и доходы по категориям, бюджет на месяц</div>
+      </div>
+      <span class="item-tag tag-core">Финансы</span>
+    </label>
+  </div>
+</div>
+
+<!-- Идеи -->
+<div class="section">
+  <div class="section-title">
+    Идеи на будущее
+    <span class="section-badge badge-idea">Идеи</span>
+  </div>
+  <div class="section-desc">Далёкие планы — просто записать чтобы не забыть</div>
+  <div class="items">
+    <label class="item">
+      <input type="checkbox">
+      <div class="item-body">
+        <div class="item-name">Виджет на экран телефона</div>
+        <div class="item-desc">Мини-виджет со streak и задачами дня прямо на рабочем столе</div>
+      </div>
+    </label>
+    <label class="item">
+      <input type="checkbox">
+      <div class="item-body">
+        <div class="item-name">Красивые шрифты и темы</div>
+        <div class="item-desc">Выбор цветовой темы (тёмная, розовая, зелёная) и шрифта для заголовков</div>
+      </div>
+    </label>
+    <label class="item">
+      <input type="checkbox">
+      <div class="item-body">
+        <div class="item-name">Напоминания</div>
+        <div class="item-desc">Push-уведомления: заполнить настроение, выпить воды, пора в косметике посмотреть сроки</div>
+      </div>
+    </label>
+    <label class="item">
+      <input type="checkbox">
+      <div class="item-body">
+        <div class="item-name">Экспорт в PDF</div>
+        <div class="item-desc">Распечатать месяц — красивая страничка для бумажного дневника</div>
+      </div>
+    </label>
+  </div>
+</div>
+
+<!-- Заметки -->
+<div class="section">
+  <div class="section-title">Заметки Кати</div>
+  <div class="section-desc">Что нравится, что не нравится, что хочется изменить?</div>
+  <div class="notes-area">
+    <div class="notes-title">Твои пожелания</div>
+    <textarea placeholder="Напиши сюда всё что думаешь — поменять цвет, добавить функцию, что-то не работает..."></textarea>
+  </div>
+</div>
+
+<div class="footer">
+  Bullet Journal — сделан специально для Кати &#10047;
+</div>
+
+<script>
+  // Save checkbox states and notes to localStorage
+  document.querySelectorAll('input[type="checkbox"]').forEach((cb, i) => {
+    const key = 'bujo-check-' + i;
+    if (localStorage.getItem(key) === 'true') {
+      cb.checked = true;
+      cb.closest('.item').classList.toggle('checked', true);
+    }
+    cb.addEventListener('change', () => {
+      localStorage.setItem(key, cb.checked);
+      cb.closest('.item').classList.toggle('checked', cb.checked);
+    });
+  });
+
+  const ta = document.querySelector('textarea');
+  ta.value = localStorage.getItem('bujo-katya-notes') || '';
+  ta.addEventListener('input', () => localStorage.setItem('bujo-katya-notes', ta.value));
+</script>
+
+</body>
+</html>

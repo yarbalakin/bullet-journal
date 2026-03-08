@@ -1,6 +1,6 @@
 // IndexedDB wrapper for Bullet Journal
 const DB_NAME = 'bujo';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 let db = null;
 
@@ -44,6 +44,11 @@ function openDB() {
       // Streak
       if (!d.objectStoreNames.contains('streak')) {
         d.createObjectStore('streak', { keyPath: 'id' }); // single record, id = "main"
+      }
+
+      // v2: Future Log
+      if (!d.objectStoreNames.contains('futurelog')) {
+        d.createObjectStore('futurelog', { keyPath: 'id' }); // id = "2026-04"
       }
     };
 
@@ -114,7 +119,7 @@ async function exportData() {
 
 // ── Cloud Sync via n8n ──
 const SYNC_URL = 'https://estateinvest.app.n8n.cloud/webhook/bujo-sync';
-const STORES = ['months', 'tasks', 'events', 'moods', 'cosmetics', 'streak'];
+const STORES = ['months', 'tasks', 'events', 'moods', 'cosmetics', 'streak', 'futurelog'];
 
 async function getAllData() {
   const data = {};
