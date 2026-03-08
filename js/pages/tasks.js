@@ -5,7 +5,23 @@ async function renderTasks(container, params = {}) {
   const month = params.month ?? now.getMonth();
   const monthId = `${year}-${String(month + 1).padStart(2, '0')}`;
 
-  const tasks = await dbGetByIndex('tasks', 'monthId', monthId);
+  // Previous month
+  const prevDate = new Date(year, month - 1, 1);
+  const prevYear = prevDate.getFullYear();
+  const prevMonth = prevDate.getMonth();
+  const prevMonthId = `${prevYear}-${String(prevMonth + 1).padStart(2, '0')}`;
+
+  // Show migration only when viewing current or future month
+  const isCurrentOrFuture = new Date(year, month, 1) >= new Date(now.getFullYear(), now.getMonth(), 1);
+  let migrationTasks = [];
+  if (isCurrentOrFuture) {
+    const prevTasks = await dbGetByIndex('tasks', 'monthId', prevMonthId);
+    migrationTasks = prevTasks.filter(t => t.status === 'pending');
+  }
+
+  const allTasks = await dbGetByIndex('tasks', 'monthId', monthId);
+  // Hide migrated/cancelled tasks from display
+  const tasks = allTasks.filter(t => t.status !== 'migrated' && t.status !== 'cancelled');
 
   // Split into dated and undated
   const dated = tasks.filter(t => t.date).sort((a, b) => a.date.localeCompare(b.date));
@@ -23,12 +39,30 @@ async function renderTasks(container, params = {}) {
     </div>
   `;
 
+  const migrationHTML = migrationTasks.length ? `
+    <div class="migration-panel">
+      <div class="migration-header">
+        <span>&#8594; Перенести из ${MONTH_NAMES[prevMonth]}</span>
+        <span class="migration-count">${migrationTasks.length}</span>
+      </div>
+      ${migrationTasks.map(t => `
+        <div class="migration-task">
+          <span class="migration-task-text">${t.title}</span>
+          <button class="migration-btn migration-btn-migrate" onclick="migrateTask(${t.id}, ${year}, ${month})" title="Перенести">&#8594;</button>
+          <button class="migration-btn migration-btn-cancel" onclick="cancelTask(${t.id}, ${year}, ${month})" title="Отменить">&#215;</button>
+        </div>
+      `).join('')}
+    </div>
+  ` : '';
+
   container.innerHTML = `
     <div class="page-tasks">
       <div class="tasks-header">
         <h2>${MONTH_NAMES[month]}</h2>
         <span class="tasks-count">${tasks.filter(t=>t.status==='done').length}/${tasks.length}</span>
       </div>
+
+      ${migrationHTML}
 
       <form class="task-add" onsubmit="addTask(event, '${monthId}', ${year}, ${month})">
         <input type="text" class="task-input" placeholder="Новая задача..." required>
@@ -50,7 +84,7 @@ async function renderTasks(container, params = {}) {
         </div>
       ` : ''}
 
-      ${!tasks.length ? '<div class="empty-state">Пока нет задач. Добавь первую!</div>' : ''}
+      ${!tasks.length && !migrationTasks.length ? '<div class="empty-state">Пока нет задач. Добавь первую!</div>' : ''}
     </div>
   `;
 }
@@ -81,6 +115,33 @@ async function toggleTask(id, currentStatus, year, month) {
 async function deleteTask(id, year, month) {
   await dbDelete('tasks', id);
   navigate('tasks', { year, month });
+}
+
+async function migrateTask(id, toYear, toMonth) {
+  const task = await dbGet('tasks', id);
+  if (!task) return;
+  // Mark original as migrated
+  task.status = 'migrated';
+  await dbPut('tasks', task);
+  // Create copy in target month
+  const toMonthId = `${toYear}-${String(toMonth + 1).padStart(2, '0')}`;
+  await dbPut('tasks', {
+    monthId: toMonthId,
+    title: task.title,
+    date: null,
+    status: 'pending',
+    createdAt: new Date().toISOString(),
+    migratedFrom: task.monthId,
+  });
+  navigate('tasks', { year: toYear, month: toMonth });
+}
+
+async function cancelTask(id, toYear, toMonth) {
+  const task = await dbGet('tasks', id);
+  if (!task) return;
+  task.status = 'cancelled';
+  await dbPut('tasks', task);
+  navigate('tasks', { year: toYear, month: toMonth });
 }
 
 route('tasks', renderTasks);
