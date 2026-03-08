@@ -1306,6 +1306,347 @@ h1, h2 {
   flex-shrink: 0;
 }
 
+/* ── HOME NAV SECTION ── */
+.home-nav-section { margin-top: 20px; }
+
+.home-nav-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.home-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+  transition: all 0.15s;
+  text-align: center;
+}
+
+.home-nav-item:active { transform: scale(0.97); background: var(--surface2); }
+
+.home-nav-icon { font-size: 20px; color: var(--pink-dark); }
+
+.home-sync-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.home-sync-btn {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text2);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s;
+}
+
+.home-sync-btn:active { background: var(--surface2); }
+.home-sync-btn.secondary { color: var(--text3); font-size: 12px; }
+
+/* Month card cover change button */
+.month-cover-btn {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,0.7);
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.month-card:hover .month-cover-btn,
+.month-card:active .month-cover-btn { opacity: 1; }
+
+/* Make month-card-name clickable without the cover btn intercepting */
+.month-card { position: relative; }
+.month-card-name { cursor: pointer; }
+
+/* ── COVER PICKER ── */
+.page-cover-picker { padding-bottom: 40px; }
+
+.cover-picker-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.cover-picker-header h2 { font-size: 24px; }
+
+.cover-picker-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.cover-option {
+  position: relative;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  cursor: pointer;
+  border: 3px solid transparent;
+  transition: border-color 0.15s, transform 0.15s;
+  aspect-ratio: 3/4;
+}
+
+.cover-option.selected { border-color: var(--pink-dark); }
+.cover-option:active { transform: scale(0.97); }
+
+.cover-option img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cover-option-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 6px 8px;
+  background: linear-gradient(transparent, rgba(0,0,0,0.45));
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.cover-option-check {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--pink-dark);
+  color: #fff;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── HABIT TRACKER ── */
+.page-habits { padding-bottom: 40px; }
+
+.habits-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.habits-header h2 { font-size: 22px; flex: 1; text-align: center; }
+
+.habit-day-labels {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+  overflow-x: auto;
+}
+
+.habit-name-col-empty {
+  width: 120px;
+  flex-shrink: 0;
+}
+
+.habits-list {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 20px;
+}
+
+.habit-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.habit-name-col {
+  width: 120px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-right: 8px;
+}
+
+.habit-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.habit-name {
+  flex: 1;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text);
+}
+
+.habit-delete {
+  background: none;
+  border: none;
+  color: var(--text3);
+  font-size: 15px;
+  cursor: pointer;
+  padding: 0;
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+.habit-cells {
+  display: flex;
+  gap: 3px;
+}
+
+.habit-day-num {
+  width: 20px;
+  text-align: center;
+  font-size: 9px;
+  color: var(--text3);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.habit-cell {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1.5px solid var(--border2);
+  background: var(--surface2);
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.habit-cell.done { border-color: transparent; }
+.habit-cell:active { transform: scale(0.85); }
+
+.habits-empty {
+  font-size: 13px;
+  color: var(--text3);
+  font-style: italic;
+  padding: 16px 0;
+  text-align: center;
+}
+
+.habit-add-form {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+
+.habit-add-input {
+  width: 100%;
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--surface2);
+  color: var(--text);
+  outline: none;
+  margin-bottom: 12px;
+}
+
+.habit-add-input:focus { border-color: var(--pink); }
+
+.habit-color-picker {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.habit-color-opt {
+  position: relative;
+  cursor: pointer;
+}
+
+.habit-color-opt input { position: absolute; opacity: 0; pointer-events: none; }
+
+.habit-color-dot {
+  display: block;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.habit-color-opt input:checked + .habit-color-dot {
+  border-color: var(--text);
+  transform: scale(1.2);
+}
+
+.habit-add-btn {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--pink);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.habit-add-btn:active { background: var(--pink-dark); }
+
+/* ── DAY NOTES ── */
+.day-notes-textarea {
+  width: 100%;
+  min-height: 100px;
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--surface2);
+  color: var(--text);
+  outline: none;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.day-notes-textarea:focus { border-color: var(--pink); }
+
 /* ── UTILS ── */
 button { -webkit-tap-highlight-color: transparent; }
 input, select, textarea { -webkit-tap-highlight-color: transparent; }

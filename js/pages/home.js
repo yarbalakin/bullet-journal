@@ -49,6 +49,11 @@ async function renderHome(container) {
     return `<span class="streak-badge ${earned ? 'earned' : ''}" title="${m.label}">${m.icon}</span>`;
   }).join('');
 
+  // Load custom covers
+  const allMonths = await dbGetAll('months');
+  const monthCovers = {};
+  allMonths.forEach(m => { if (m.coverIndex !== undefined) monthCovers[m.id] = m.coverIndex; });
+
   container.innerHTML = `
     <div class="page-home">
       <div class="home-header">
@@ -64,34 +69,43 @@ async function renderHome(container) {
           const isCurrent = i === currentMonth;
           const isPast = i < currentMonth;
           const grad = COVER_GRADIENTS[i];
-          const img = COVER_IMAGES[i];
+          const monthId = `${year}-${String(i + 1).padStart(2, '0')}`;
+          const coverIdx = monthCovers[monthId] !== undefined ? monthCovers[monthId] : i;
+          const img = COVER_IMAGES[coverIdx];
           return `
             <div class="month-card ${isCurrent ? 'current' : ''} ${isPast ? 'past' : ''}"
-                 onclick="navigate('calendar', { year: ${year}, month: ${i} })"
                  style="background: linear-gradient(135deg, ${grad[0]}, ${grad[1]}); background-image: url('${img}'); background-size: cover; background-position: center">
-              <div class="month-card-name">${name}</div>
+              <div class="month-card-name" onclick="navigate('calendar', { year: ${year}, month: ${i} })">${name}</div>
               ${isCurrent ? '<div class="month-card-badge">сейчас</div>' : ''}
+              <button class="month-cover-btn" onclick="navigate('coverPicker', { year: ${year}, month: ${i} })">&#10000;</button>
             </div>
           `;
         }).join('')}
       </div>
-      <div class="home-pixels-link" onclick="navigate('collections')">
-        Коллекции &#8594;
-      </div>
-      <div class="home-pixels-link" onclick="navigate('future')">
-        Future Log &#8594;
-      </div>
-      <div class="home-pixels-link" onclick="navigate('pixels')">
-        Year in Pixels ${year}
-      </div>
-      <div class="home-pixels-link" onclick="syncToCloud()" style="margin-top:10px; font-size:13px;">
-        Сохранить в облако
-      </div>
-      <div class="home-pixels-link" onclick="restoreFromCloud()" style="margin-top:8px; font-size:13px; color:var(--text3)">
-        Восстановить из облака
-      </div>
-      <div class="home-pixels-link" onclick="exportData()" style="margin-top:8px; font-size:12px; color:var(--text3)">
-        Скачать JSON-бэкап
+      <div class="home-nav-section">
+        <div class="home-nav-grid">
+          <div class="home-nav-item" onclick="navigate('habits', { year: ${year}, month: ${currentMonth} })">
+            <span class="home-nav-icon">&#9679;&#9679;</span>
+            <span>Привычки</span>
+          </div>
+          <div class="home-nav-item" onclick="navigate('pixels')">
+            <span class="home-nav-icon">&#9632;</span>
+            <span>Пиксели</span>
+          </div>
+          <div class="home-nav-item" onclick="navigate('future')">
+            <span class="home-nav-icon">&#8594;</span>
+            <span>Future Log</span>
+          </div>
+          <div class="home-nav-item" onclick="navigate('collections')">
+            <span class="home-nav-icon">&#9733;</span>
+            <span>Коллекции</span>
+          </div>
+        </div>
+        <div class="home-sync-row">
+          <button class="home-sync-btn" onclick="syncToCloud()">&#9729; Сохранить в облако</button>
+          <button class="home-sync-btn secondary" onclick="restoreFromCloud()">&#8635; Восстановить</button>
+          <button class="home-sync-btn secondary" onclick="exportData()">&#8675; JSON-бэкап</button>
+        </div>
       </div>
     </div>
   `;

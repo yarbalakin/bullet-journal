@@ -16,6 +16,7 @@ async function renderDay(container, params = {}) {
   const dayEvents = allEvents.filter(e => e.date === dateStr).sort((a, b) => (a.time || '').localeCompare(b.time || ''));
   const allTasks = await dbGetByIndex('tasks', 'monthId', monthId);
   const dayTasks = allTasks.filter(t => t.date === dateStr);
+  const dayNote = await dbGet('daynotes', dateStr);
 
   // Mood section
   const moodHTML = `
@@ -71,6 +72,14 @@ async function renderDay(container, params = {}) {
     </div>
   `;
 
+  const notesHTML = `
+    <div class="day-section">
+      <div class="day-section-title">Заметки дня</div>
+      <textarea class="day-notes-textarea" placeholder="Как прошёл день..."
+                onblur="saveDayNote('${dateStr}', this.value)">${dayNote?.text || ''}</textarea>
+    </div>
+  `;
+
   container.innerHTML = `
     <div class="page-day">
       <div class="day-header">
@@ -81,10 +90,19 @@ async function renderDay(container, params = {}) {
         </div>
       </div>
       ${moodHTML}
+      ${notesHTML}
       ${eventsHTML}
       ${tasksHTML}
     </div>
   `;
+}
+
+async function saveDayNote(dateStr, text) {
+  if (text.trim()) {
+    await dbPut('daynotes', { date: dateStr, text: text.trim() });
+  } else {
+    await dbDelete('daynotes', dateStr);
+  }
 }
 
 async function setMoodDay(dateStr, level) {

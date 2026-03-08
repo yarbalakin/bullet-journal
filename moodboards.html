@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ballet Journal — Выбери свой стиль</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,600&family=Poppins:wght@400;500;600&family=Montserrat:wght@400;500;600;700&family=Dancing+Script:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', sans-serif; background: #f5f5f5; color: #333; }
+
+  .hero {
+    text-align: center;
+    padding: 60px 20px 40px;
+    background: linear-gradient(135deg, #fdf2f8, #f3e8ff, #ecfdf5);
+  }
+  .hero h1 { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 600; margin-bottom: 12px; color: #1a1a2e; }
+  .hero p { font-size: 16px; color: #666; max-width: 500px; margin: 0 auto; line-height: 1.6; }
+
+  .boards { max-width: 1200px; margin: 0 auto; padding: 40px 20px 80px; display: flex; flex-direction: column; gap: 60px; }
+
+  /* ── BOARD CONTAINER ── */
+  .board {
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  }
+  .board-header {
+    padding: 32px 40px 24px;
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; flex-wrap: wrap;
+  }
+  .board-info h2 { font-size: 28px; font-weight: 700; margin-bottom: 6px; }
+  .board-info .subtitle { font-size: 14px; opacity: 0.7; margin-bottom: 12px; }
+  .board-info .mood { font-size: 15px; font-style: italic; opacity: 0.8; line-height: 1.5; max-width: 400px; }
+  .board-refs { font-size: 12px; opacity: 0.5; text-align: right; }
+  .board-refs strong { display: block; margin-bottom: 4px; opacity: 0.8; }
+
+  /* ── PALETTE ── */
+  .palette { display: flex; gap: 0; height: 60px; margin: 0 40px; border-radius: 14px; overflow: hidden; }
+  .swatch { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; letter-spacing: 0.5px; }
+
+  /* ── CONTENT GRID ── */
+  .board-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    padding: 24px 40px 40px;
+  }
+
+  /* ── COMPONENTS DEMO ── */
+  .components { padding-right: 30px; display: flex; flex-direction: column; gap: 20px; }
+  .comp-section h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.4; margin-bottom: 10px; }
+
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .demo-btn { padding: 10px 22px; border-radius: 12px; border: none; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: 0.15s; }
+  .demo-btn-pill { border-radius: 50px; }
+  .demo-btn-outline { background: transparent !important; border: 2px solid; }
+
+  .demo-card {
+    border-radius: 14px;
+    padding: 16px 18px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .demo-card .card-title { font-size: 14px; font-weight: 600; }
+  .demo-card .card-desc { font-size: 12px; opacity: 0.6; line-height: 1.5; }
+
+  .demo-checkbox { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+  .check-circle {
+    width: 22px; height: 22px; border-radius: 50%; border: 2px solid;
+    display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0;
+  }
+  .check-done { text-decoration: line-through; opacity: 0.5; }
+
+  .demo-tag { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+
+  /* ── PHONE MOCKUP ── */
+  .phone-wrap { display: flex; justify-content: center; align-items: flex-start; }
+  .phone {
+    width: 260px;
+    border-radius: 32px;
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+    position: relative;
+  }
+  .phone-screen { padding: 0; }
+
+  .phone-status { height: 44px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; }
+  .phone-content { padding: 0 16px 20px; }
+
+  .phone-greeting { font-size: 20px; font-weight: 700; margin-bottom: 4px; padding: 0 4px; }
+  .phone-sub { font-size: 12px; opacity: 0.5; margin-bottom: 16px; padding: 0 4px; }
+
+  .phone-card {
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .phone-card-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .phone-card-text { font-size: 11px; opacity: 0.6; }
+
+  .phone-task {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 0;
+    font-size: 13px;
+  }
+  .phone-task .check-circle { width: 18px; height: 18px; font-size: 10px; }
+  .phone-task-priority { width: 3px; height: 20px; border-radius: 2px; flex-shrink: 0; }
+
+  .phone-nav {
+    display: flex; justify-content: space-around; align-items: center;
+    padding: 10px 0 6px;
+    margin: 12px 8px 0;
+    border-radius: 20px;
+    font-size: 18px;
+  }
+  .phone-nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 9px; opacity: 0.4; }
+  .phone-nav-item.active { opacity: 1; }
+  .phone-nav-fab {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; color: white; margin-top: -20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+
+  .mini-cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; margin-bottom: 12px; }
+  .mini-cal-day { width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 9px; border-radius: 50%; }
+  .mini-cal-header { font-size: 8px; opacity: 0.3; font-weight: 600; }
+  .mini-cal-today { font-weight: 700; }
+
+  .streak-bar { display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 12px; padding: 0 4px; }
+  .streak-fire { font-size: 16px; }
+  .streak-num { font-weight: 700; }
+  .streak-label { opacity: 0.4; font-size: 11px; }
+
+  @media (max-width: 700px) {
+    .board-content { grid-template-columns: 1fr; }
+    .components { padding-right: 0; margin-bottom: 20px; }
+    .board-header { padding: 24px 20px 16px; }
+    .palette { margin: 0 20px; }
+    .board-content { padding: 24px 20px 32px; }
+    .hero h1 { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Ballet Journal</h1>
+  <p>Четыре стилевых направления для приложения. Посмотри каждый вариант и выбери, какой ближе по духу.</p>
+</div>
+
+<div class="boards">
+
+<!-- ════════════════════════════════════════════════════ -->
+<!--  СТИЛЬ 1: ЭЛЕГАНТНЫЙ БАЛЕТ                         -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="board" style="background: #FFF8F0;">
+  <div class="board-header">
+    <div class="board-info">
+      <h2 style="font-family:'Playfair Display',serif; color:#3A3A3A;">1. Элегантный балет</h2>
+      <div class="subtitle" style="color:#3A3A3A;">Grace & Form + Planbella</div>
+      <div class="mood" style="color:#3A3A3A;">Как красивая программка в Мариинском театре. Крем, лаванда, пыльная роза. Серифные заголовки. Тонкие линии. Сдержанная роскошь.</div>
+    </div>
+    <div class="board-refs" style="color:#3A3A3A;">
+      <strong>Референсы:</strong>
+      Grace & Form<br>Planbella<br>Pencil Planner
+    </div>
+  </div>
+
+  <div class="palette">
+    <div class="swatch" style="background:#FFF8F0; color:#3A3A3A;">FFF8F0</div>
+    <div class="swatch" style="background:#C4A8D1; color:#fff;">C4A8D1</div>
+    <div class="swatch" style="background:#D4A5A5; color:#fff;">D4A5A5</div>
+    <div class="swatch" style="background:#B5D8CC; color:#3A3A3A;">B5D8CC</div>
+    <div class="swatch" style="background:#E8D5C4; color:#3A3A3A;">E8D5C4</div>
+    <div class="swatch" style="background:#3A3A3A; color:#fff;">3A3A3A</div>
+  </div>
+
+  <div class="board-content">
+    <div class="components">
+      <div class="comp-section">
+        <h3 style="color:#3A3A3A;">Кнопки</h3>
+        <div class="btn-row">
+          <button class="demo-btn" style="background:#C4A8D1; color:#fff; font-family:'Poppins',sans-serif;">Добавить занятие</button>
+          <button class="demo-btn demo-btn-pill" style="background:#D4A5A5; color:#fff; font-family:'Poppins',sans-serif;">Сохранить</button>
+          <button class="demo-btn demo-btn-outline" style="color:#C4A8D1; border-color:#C4A8D1; font-family:'Poppins',sans-serif;">Отмена</button>
+        </div>
+      </div>
+      <div class="comp-section">
+        <h3 style="color:#3A3A3A;">Карточка</h3>
+        <div class="demo-card" style="background:#fff; border: 1px solid #E8D5C4;">
+          <div class="card-title" style="font-family:'Playfair Display',serif; color:#3A3A3A;">Занятие у станка</div>
+          <div class="card-desc" style="color:#3A3A3A;">Pli&eacute;, rond de jambe, battement tendu. Работа над выворотностью.</div>
+          <div style="display:flex;gap:6px;">
+            <span class="demo-tag" style="background:#C4A8D120; color:#C4A8D1;">barre</span>
+            <span class="demo-tag" style="background:#B5D8CC30; color:#6aa895;">technique</span>
+          </div>
+        </div>
+      </div>
+      <div class="comp-section">
+        <h3 style="color:#3A3A3A;">Чекбоксы</h3>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div class="demo-checkbox"><div class="check-circle" style="border-color:#C4A8D1; background:#C4A8D1; color:#fff;">&#10003;</div><span class="check-done" style="color:#3A3A3A;">Grand pli&eacute; &mdash; 2x8</span></div>
+          <div class="demo-checkbox"><div class="check-circle" style="border-color:#D4A5A5;"></div><span style="color:#3A3A3A;">Battement tendu &mdash; 3x8</span></div>
+          <div class="demo-checkbox"><div class="check-circle" style="border-color:#D4A5A5;"></div><span style="color:#3A3A3A;">Rond de jambe en l'air</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone" style="background:#FFF8F0; border: 1px solid #E8D5C4;">
+        <div class="phone-screen">
+          <div class="phone-status" style="color:#3A3A3A;">9:41</div>
+          <div class="phone-content">
+            <div class="streak-bar" style="color:#3A3A3A;">
+              <span class="streak-fire">&#127801;</span>
+              <span class="streak-num">12</span>
+              <span class="streak-label">дней подряд</span>
+            </div>
+            <div class="phone-greeting" style="font-family:'Playfair Display',serif; color:#3A3A3A;">Доброе утро, Катя</div>
+            <div class="phone-sub" style="color:#3A3A3A;">Суббота, 1 марта</div>
+
+            <div class="phone-card" style="background:#fff; border:1px solid #E8D5C4;">
+              <div class="phone-card-title" style="color:#C4A8D1; font-family:'Playfair Display',serif;">Следующее занятие</div>
+              <div class="phone-card-text" style="color:#3A3A3A;">Балет, 10:00 &mdash; Студия "Арабеск"</div>
+            </div>
+
+            <div style="font-size:11px; color:#3A3A3A; opacity:0.4; margin:12px 0 6px; text-transform:uppercase; letter-spacing:1px; font-weight:600;">Задачи на сегодня</div>
+            <div class="phone-task" style="color:#3A3A3A; border-bottom: 1px solid #E8D5C4;">
+              <div class="phone-task-priority" style="background:#C4A8D1;"></div>
+              <div class="check-circle" style="border-color:#C4A8D1; background:#C4A8D1; color:#fff; width:16px;height:16px;font-size:9px;">&#10003;</div>
+              <span class="check-done">Растяжка утром</span>
+            </div>
+            <div class="phone-task" style="color:#3A3A3A; border-bottom: 1px solid #E8D5C4;">
+              <div class="phone-task-priority" style="background:#D4A5A5;"></div>
+              <div class="check-circle" style="border-color:#D4A5A5; width:16px;height:16px;"></div>
+              <span>Записать видео арабеска</span>
+            </div>
+            <div class="phone-task" style="color:#3A3A3A;">
+              <div class="phone-task-priority" style="background:#B5D8CC;"></div>
+              <div class="check-circle" style="border-color:#B5D8CC; width:16px;height:16px;"></div>
+              <span>Купить эластичную ленту</span>
+            </div>
+
+            <div class="phone-nav" style="background:#fff; border:1px solid #E8D5C4;">
+              <div class="phone-nav-item active" style="color:#C4A8D1;"><span style="font-size:16px;">&#9750;</span>Журнал</div>
+              <div class="phone-nav-item" style="color:#3A3A3A;"><span style="font-size:16px;">&#128197;</span>Календарь</div>
+              <div class="phone-nav-fab" style="background:#C4A8D1;">+</div>
+              <div class="phone-nav-item" style="color:#3A3A3A;"><span style="font-size:16px;">&#9733;</span>Навыки</div>
+              <div class="phone-nav-item" style="color:#3A3A3A;"><span style="font-size:16px;">&#128100;</span>Профиль</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════ -->
+<!--  СТИЛЬ 2: ТЁМНАЯ СЦЕНА                            -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="board" style="background: #141414;">
+  <div class="board-header">
+    <div class="board-info">
+      <h2 style="font-family:'Montserrat',sans-serif; color:#D4C1BC;">2. Тёмная сцена</h2>
+      <div class="subtitle" style="color:#BEBEBB;">Sleek Ballet Fitness</div>
+      <div class="mood" style="color:#BEBEBB;">Закулисье балетного театра. Софиты, тюль, бархат. Глубокий charcoal с фиолетовым акцентом. Контраст и драматизм.</div>
+    </div>
+    <div class="board-refs" style="color:#BEBEBB;">
+      <strong>Референсы:</strong>
+      Sleek Ballet Fitness<br>Sleek Technique
+    </div>
+  </div>
+
+  <div class="palette">
+    <div class="swatch" style="background:#141414; color:#BEBEBB;">141414</div>
+    <div class="swatch" style="background:#1E1E2A; color:#BEBEBB;">1E1E2A</div>
+    <div class="swatch" style="background:#D8B5E6; color:#141414;">D8B5E6</div>
+    <div class="swatch" style="background:#D4C1BC; color:#141414;">D4C1BC</div>
+    <div class="swatch" style="background:#FFFFFF; color:#141414;">FFFFFF</div>
+    <div class="swatch" style="background:#BEBEBB; color:#141414;">BEBEBB</div>
+  </div>
+
+  <div class="board-content">
+    <div class="components">
+      <div class="comp-section">
+        <h3 style="color:#BEBEBB;">Кнопки</h3>
+        <div class="btn-row">
+          <button class="demo-btn" style="background:#D8B5E6; color:#141414; font-family:'Montserrat',sans-serif;">Добавить занятие</button>
+          <button class="demo-btn demo-btn-pill" style="background:#D4C1BC; color:#141414; font-family:'Montserrat',sans-serif;">Сохранить</button>
+          <button class="demo-btn demo-btn-outline" style="color:#D8B5E6; border-color:#D8B5E6; font-family:'Montserrat',sans-serif;">Отмена</button>
+        </div>
+      </div>
+      <div class="comp-section">
+        <h3 style="color:#BEBEBB;">Карточка</h3>
+        <div class="demo-card" style="background:#1E1E2A; border: 1px solid #2a2a3a;">
+          <div class="card-title" style="font-family:'Montserrat',sans-serif; color:#D4C1BC;">Занятие у станка</div>
+          <div class="card-desc" style="color:#BEBEBB;">Pli&eacute;, rond de jambe, battement tendu. Работа над выворотностью.</div>
+          <div style="display:flex;gap:6px;">
+            <span class="demo-tag" style="background:#D8B5E620; color:#D8B5E6;">barre</span>
+            <span class="demo-tag" style="background:#D4C1BC20; color:#D4C1BC;">technique</span>
+          </div>
+        </div>
+      </div>
+      <div class="comp-section">
+        <h3 style="color:#BEBEBB;">Чекбоксы</h3>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div class="demo-checkbox"><div class="check-circle" style="border-color:#D8B5E6; background:#D8B5E6; color:#141414;">&#10003;</div><span class="check-done" style="color:#BEBEBB;">Grand pli&eacute; &mdash; 2x8</span></div>
+          <div class="demo-checkbox"><div class="check-circle" style="border-color:#555;"></div><span style="color:#fff;">Battement tendu &mdash; 3x8</span></div>
+          <div class="demo-checkbox"><div class="check-circle" style="border-color:#555;"></div><span style="color:#fff;">Rond de jambe en l'air</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone" style="background:#141414; border: 1px solid #2a2a3a;">
+        <div class="phone-screen">
+          <div class="phone-status" style="color:#fff;">9:41</div>
+          <div class="phone-content">
+            <div class="streak-bar" style="color:#fff;">
+              <span class="streak-fire">&#10024;</span>
+              <span class="streak-num" style="color:#D8B5E6;">12</span>
+              <span class="streak-label" style="color:#BEBEBB;">дней подряд</span>
+            </div>
+            <div class="phone-greeting" style="font-family:'Montserrat',sans-serif; color:#D4C1BC;">Доброе утро, Катя</div>
+            <div class="phone-sub" style="color:#BEBEBB;">Суббота, 1 марта</div>
+
+            <div class="phone-card" style="background:#1E1E2A; border:1px solid #2a2a3a;">
+              <div class="phone-card-title" style="color:#D8B5E6; font-family:'Montserrat',sans-serif;">Следующее занятие</div>
+              <div class="phone-card-text" style="color:#BEBEBB;">Балет, 10:00 &mdash; Студия "Арабеск"</div>
+            </div>
+
+            <div style="font-size:11px; color:#BEBEBB; opacity:0.4; margin:12px 0 6px; text-transform:uppercase; letter-spacing:1px; font-weight:600;">Задачи на сегодня</div>
+            <div class="phone-task" style="color:#fff; border-bottom: 1px solid #2a2a3a;">
+              <div class="phone-task-priority" style="background:#D8B5E6;"></div>
+              <div class="check-circle" style="border-color:#D8B5E6; background:#D8B5E6; color:#141414; width:16px;height:16px;font-size:9px;">&#10003;</div>
+              <span class="check-done" style="color:#BEBEBB;">Растяжка утром</span>
+            </div>
+            <div class="phone-task" style="color:#fff; border-bottom: 1px solid #2a2a3a;">
+              <div class="phone-task-priority" style="background:#D4C1BC;"></div>
+              <div class="check-circle" style="border-color:#555; width:16px;height:16px;"></div>
+              <span>Записать видео арабеска</span>
+            </div>
+            <div class="phone-task" style="color:#fff;">
+              <div class="phone-task-priority" style="background:#555;"></div>
+              <div class="check-circle" style="border-color:#555; width:16px;height:16px;"></div>
+              <span>Купить эластичную ленту</span>
+            </div>
+
+            <div class="phone-nav" style="background:#1E1E2A; border:1px solid #2a2a3a;">
+              <div class="phone-nav-item active" style="color:#D8B5E6;"><span style="font-size:16px;">&#9750;</span>Журнал</div>
+              <div class="phone-nav-item" style="color:#BEBEBB;"><span style="font-size:16px;">&#128197;</span>Календарь</div>
+              <div class="phone-nav-fab" style="background:#D8B5E6; color:#141414;">+</div>
+              <div class="phone-nav-item" style="color:#BEBEBB;"><span style="font-size:16px;">&#9733;</span>Навыки</div>
+              <div class="phone-nav-item" style="color:#BEBEBB;"><span style="font-size:16px;">&#128100;</span>Профиль</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════ -->
+<!--  СТИЛЬ 3: УЮТНЫЙ ДНЕВНИК                          -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="board" style="background: #FDF6F0;">
+  <div class="board-header">
+    <div class="board-info">
+      <h2 style="font-family:'Poppins',sans-serif; color:#5a4a42;">3. Уютный дневник</h2>
+      <div class="subtitle" style="color:#5a4a42;">Finch + Tiimo + Floret</div>
+      <div class="mood" style="color:#5a4a42;">Уютный вечер с чаем и блокнотом. Тёплые пастельные тона, максимально скруглённые формы, мягкие тени. Обнимает и не давит.</div>
+    </div>
+    <div class="board-refs" style="color:#5a4a42;">
+      <strong>Референсы:</strong>
+      Finch<br>Tiimo<br>Floret<br>Tweek
+    </div>
+  </div>
+
+  <div class="palette">
+    <div class="swatch" style="background:#FDF6F0; color:#5a4a42;">FDF6F0</div>
+    <div class="swatch" style="background:#F5D6C8; color:#5a4a42;">F5D6C8</div>
+    <div class="swatch" style="background:#D4E7D0; color:#5a4a42;">D4E7D0</div>
+    <div class="swatch" style="background:#DDD5F3; color:#5a4a42;">DDD5F3</div>
+    <div class="swatch" style="background:#FADCD9; color:#5a4a42;">FADCD9</div>
+    <div class="swatch" style="background:#5a4a42; color:#FDF6F0;">5a4a42</div>
+  </div>
+
+  <div class="board-content">
+    <div class="components">
+      <div class="comp-section">
+        <h3 style="color:#5a4a42;">Кнопки</h3>
+        <div class="btn-row">
+          <button class="demo-btn demo-btn-pill" style="background:#D4E7D0; color:#3a5a3a; font-family:'Poppins',sans-serif; border-radius:50px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">Добавить занятие</button>
+          <button class="demo-btn demo-btn-pill" style="background:#DDD5F3; color:#5a4a6a; font-family:'Poppins',sans-serif; border-radius:50px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">Сохранить</button>
+          <button class="demo-btn demo-btn-pill demo-btn-outline" style="color:#5a4a42; border-color:#F5D6C8; font-family:'Poppins',sans-serif; border-radius:50px;">Отмена</button>
+        </div>
+      </div>
+      <div class="comp-section">
+        <h3 style="color:#5a4a42;">Карточка</h3>
+        <div class="demo-card" style="background:#fff; border-radius: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.05);">
+          <div class="card-title" style="font-family:'Poppins',sans-serif; color:#5a4a42;">Занятие у станка</div>
+          <div class="card-desc" style="color:#5a4a42;">Pli&eacute;, rond de jambe, battement tendu. Работа над выворотностью.</div>
+          <div style="display:flex;gap:6px;">
+            <span class="demo-tag" style="background:#DDD5F3; color:#7a6a9a; border-radius:20px;">barre</span>
+            <span class="demo-tag" style="background:#D4E7D0; color:#4a7a4a; border-radius:20px;">technique</span>
+          </div>
+        </div>
+      </div>
+      <div class="comp-section">
+        <h3 style="color:#5a4a42;">Чекбоксы</h3>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div class="demo-checkbox"><div class="check-circle" style="border-color:#D4E7D0; background:#D4E7D0; color:#3a5a3a;">&#10003;</div><span class="check-done" style="color:#5a4a42;">Grand pli&eacute; &mdash; 2x8</span></div>
+          <div class="demo-checkbox"><div class="check-circle" style="border-color:#F5D6C8;"></div><span style="color:#5a4a42;">Battement tendu &mdash; 3x8</span></div>
+          <div class="demo-checkbox"><div class="check-circle" style="border-color:#F5D6C8;"></div><span style="color:#5a4a42;">Rond de jambe en l'air</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone" style="background:#FDF6F0; box-shadow: 0 8px 40px rgba(90,74,66,0.12);">
+        <div class="phone-screen">
+          <div class="phone-status" style="color:#5a4a42;">9:41</div>
+          <div class="phone-content">
+            <div class="streak-bar" style="color:#5a4a42;">
+              <span class="streak-fire">&#127804;</span>
+              <span class="streak-num">12</span>
+              <span class="streak-label">дней подряд</span>
+            </div>
+            <div class="phone-greeting" style="font-family:'Poppins',sans-serif; color:#5a4a42;">Привет, Катя!</div>
+            <div class="phone-sub" style="color:#5a4a42;">Суббота, 1 марта</div>
+
+            <div class="phone-card" style="background:#fff; border-radius:20px; box-shadow: 0 2px 10px rgba(0,0,0,0.04);">
+              <div class="phone-card-title" style="color:#7a6a9a; font-family:'Poppins',sans-serif;">Следующее занятие</div>
+              <div class="phone-card-text" style="color:#5a4a42;">Балет, 10:00 &mdash; Студия "Арабеск"</div>
+            </div>
+
+            <div style="font-size:11px; color:#5a4a42; opacity:0.4; margin:12px 0 6px; text-transform:uppercase; letter-spacing:1px; font-weight:600;">Задачи на сегодня</div>
+            <div class="phone-task" style="color:#5a4a42; border-bottom: 1px solid #F5D6C830;">
+              <div class="phone-task-priority" style="background:#D4E7D0; border-radius:4px;"></div>
+              <div class="check-circle" style="border-color:#D4E7D0; background:#D4E7D0; color:#3a5a3a; width:16px;height:16px;font-size:9px;">&#10003;</div>
+              <span class="check-done">Растяжка утром</span>
+            </div>
+            <div class="phone-task" style="color:#5a4a42; border-bottom: 1px solid #F5D6C830;">
+              <div class="phone-task-priority" style="background:#FADCD9; border-radius:4px;"></div>
+              <div class="check-circle" style="border-color:#F5D6C8; width:16px;height:16px;"></div>
+              <span>Записать видео арабеска</span>
+            </div>
+            <div class="phone-task" style="color:#5a4a42;">
+              <div class="phone-task-priority" style="background:#DDD5F3; border-radius:4px;"></div>
+              <div class="check-circle" style="border-color:#DDD5F3; width:16px;height:16px;"></div>
+              <span>Купить эластичную ленту</span>
+            </div>
+
+            <div class="phone-nav" style="background:#fff; border-radius:24px; box-shadow: 0 2px 10px rgba(0,0,0,0.06);">
+              <div class="phone-nav-item active" style="color:#7a6a9a;"><span style="font-size:16px;">&#9750;</span>Журнал</div>
+              <div class="phone-nav-item" style="color:#5a4a42;"><span style="font-size:16px;">&#128197;</span>Календарь</div>
+              <div class="phone-nav-fab" style="background:#DDD5F3; color:#5a4a6a; box-shadow: 0 4px 12px rgba(221,213,243,0.5);">+</div>
+              <div class="phone-nav-item" style="color:#5a4a42;"><span style="font-size:16px;">&#9733;</span>Навыки</div>
+              <div class="phone-nav-item" style="color:#5a4a42;"><span style="font-size:16px;">&#128100;</span>Профиль</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════ -->
+<!--  СТИЛЬ 4: ЧИСТЫЙ МИНИМАЛИЗМ                       -->
+<!-- ════════════════════════════════════════════════════ -->
+<div class="board" style="background: #FFFFFF;">
+  <div class="board-header">
+    <div class="board-info">
+      <h2 style="font-family:'Inter',sans-serif; color:#111;">4. Чистый минимализм</h2>
+      <div class="subtitle" style="color:#111;">Structured + Sunsama</div>
+      <div class="mood" style="color:#555;">Ничего лишнего. Белый фон, один акцентный цвет, много воздуха. Фокус на контенте, а не на декорациях. Инструмент, а не игрушка.</div>
+    </div>
+    <div class="board-refs" style="color:#999;">
+      <strong>Референсы:</strong>
+      Structured<br>Sunsama<br>Todoist<br>Clue
+    </div>
+  </div>
+
+  <div class="palette">
+    <div class="swatch" style="background:#FFFFFF; color:#111; border:1px solid #eee;">FFFFFF</div>
+    <div class="swatch" style="background:#F7F7F8; color:#111;">F7F7F8</div>
+    <div class="swatch" style="background:#E8E0F0; color:#111;">E8E0F0</div>
+    <div class="swatch" style="background:#7C5CFC; color:#fff;">7C5CFC</div>
+    <div class="swatch" style="background:#111111; color:#fff;">111111</div>
+    <div class="swatch" style="background:#999999; color:#fff;">999999</div>
+  </div>
+
+  <div class="board-content">
+    <div class="components">
+      <div class="comp-section">
+        <h3 style="color:#999;">Кнопки</h3>
+        <div class="btn-row">
+          <button class="demo-btn" style="background:#7C5CFC; color:#fff; font-family:'Inter',sans-serif;">Добавить занятие</button>
+          <button class="demo-btn" style="background:#111; color:#fff; font-family:'Inter',sans-serif;">Сохранить</button>
+          <button class="demo-btn demo-btn-outline" style="color:#111; border-color:#ddd; font-family:'Inter',sans-serif;">Отмена</button>
+        </div>
+      </div>
+      <div class="comp-section">
+        <h3 style="color:#999;">Карточка</h3>
+        <div class="demo-card" style="background:#F7F7F8; border: 1px solid #eee;">
+          <div class="card-title" style="font-family:'Inter',sans-serif; color:#111;">Занятие у станка</div>
+          <div class="card-desc" style="color:#666;">Pli&eacute;, rond de jambe, battement tendu. Работа над выворотностью.</div>
+          <div style="display:flex;gap:6px;">
+            <span class="demo-tag" style="background:#E8E0F0; color:#7C5CFC;">barre</span>
+            <span class="demo-tag" style="background:#eee; color:#666;">technique</span>
+          </div>
+        </div>
+      </div>
+      <div class="comp-section">
+        <h3 style="color:#999;">Чекбоксы</h3>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div class="demo-checkbox"><div class="check-circle" style="border-color:#7C5CFC; background:#7C5CFC; color:#fff;">&#10003;</div><span class="check-done" style="color:#111;">Grand pli&eacute; &mdash; 2x8</span></div>
+          <div class="demo-checkbox"><div class="check-circle" style="border-color:#ddd;"></div><span style="color:#111;">Battement tendu &mdash; 3x8</span></div>
+          <div class="demo-checkbox"><div class="check-circle" style="border-color:#ddd;"></div><span style="color:#111;">Rond de jambe en l'air</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone" style="background:#fff; border: 1px solid #eee;">
+        <div class="phone-screen">
+          <div class="phone-status" style="color:#111;">9:41</div>
+          <div class="phone-content">
+            <div class="streak-bar" style="color:#111;">
+              <span class="streak-num" style="color:#7C5CFC; font-size:18px;">12</span>
+              <span class="streak-label">дней подряд</span>
+              <div style="flex:1;height:4px;background:#eee;border-radius:2px;margin-left:8px;"><div style="width:65%;height:100%;background:#7C5CFC;border-radius:2px;"></div></div>
+            </div>
+            <div class="phone-greeting" style="font-family:'Inter',sans-serif; color:#111; font-size:18px;">Доброе утро, Катя</div>
+            <div class="phone-sub" style="color:#999;">Суббота, 1 марта</div>
+
+            <div class="phone-card" style="background:#F7F7F8; border:1px solid #eee;">
+              <div class="phone-card-title" style="color:#7C5CFC;">Следующее занятие</div>
+              <div class="phone-card-text" style="color:#666;">Балет, 10:00 &mdash; Студия "Арабеск"</div>
+            </div>
+
+            <div style="font-size:11px; color:#999; margin:12px 0 6px; text-transform:uppercase; letter-spacing:1px; font-weight:600;">Задачи на сегодня</div>
+            <div class="phone-task" style="color:#111; border-bottom: 1px solid #f0f0f0;">
+              <div class="check-circle" style="border-color:#7C5CFC; background:#7C5CFC; color:#fff; width:16px;height:16px;font-size:9px;">&#10003;</div>
+              <span class="check-done">Растяжка утром</span>
+            </div>
+            <div class="phone-task" style="color:#111; border-bottom: 1px solid #f0f0f0;">
+              <div class="check-circle" style="border-color:#ddd; width:16px;height:16px;"></div>
+              <span>Записать видео арабеска</span>
+            </div>
+            <div class="phone-task" style="color:#111;">
+              <div class="check-circle" style="border-color:#ddd; width:16px;height:16px;"></div>
+              <span>Купить эластичную ленту</span>
+            </div>
+
+            <div class="phone-nav" style="background:#F7F7F8; border:1px solid #eee;">
+              <div class="phone-nav-item active" style="color:#7C5CFC;"><span style="font-size:16px;">&#9750;</span>Журнал</div>
+              <div class="phone-nav-item" style="color:#999;"><span style="font-size:16px;">&#128197;</span>Календарь</div>
+              <div class="phone-nav-fab" style="background:#7C5CFC;">+</div>
+              <div class="phone-nav-item" style="color:#999;"><span style="font-size:16px;">&#9733;</span>Навыки</div>
+              <div class="phone-nav-item" style="color:#999;"><span style="font-size:16px;">&#128100;</span>Профиль</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /boards -->
+
+<div style="text-align:center; padding: 20px 20px 60px; color:#999; font-size:13px;">
+  Какой стиль ближе? Можно комбинировать элементы из разных вариантов.
+</div>
+
+</body>
+</html>
