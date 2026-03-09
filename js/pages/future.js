@@ -2,9 +2,9 @@
 async function renderFuture(container) {
   const now = new Date();
 
-  // Build list of 6 months starting from next month
+  // Build list of 12 months starting from next month
   const months = [];
-  for (let i = 1; i <= 6; i++) {
+  for (let i = 1; i <= 12; i++) {
     const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
     months.push({ year: d.getFullYear(), month: d.getMonth() });
   }
