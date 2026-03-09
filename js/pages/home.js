@@ -74,10 +74,11 @@ async function renderHome(container) {
           const img = COVER_IMAGES[coverIdx];
           return `
             <div class="month-card ${isCurrent ? 'current' : ''} ${isPast ? 'past' : ''}"
+                 onclick="navigate('calendar', { year: ${year}, month: ${i} })"
                  style="background: linear-gradient(135deg, ${grad[0]}, ${grad[1]}); background-image: url('${img}'); background-size: cover; background-position: center">
-              <div class="month-card-name" onclick="navigate('calendar', { year: ${year}, month: ${i} })">${name}</div>
+              <div class="month-card-name">${name}</div>
               ${isCurrent ? '<div class="month-card-badge">сейчас</div>' : ''}
-              <button class="month-cover-btn" onclick="navigate('coverPicker', { year: ${year}, month: ${i} })">&#10000;</button>
+              <button class="month-cover-btn" onclick="event.stopPropagation(); navigate('coverPicker', { year: ${year}, month: ${i} })">&#10000;</button>
             </div>
           `;
         }).join('')}
