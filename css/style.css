@@ -428,9 +428,16 @@ h1, h2 {
 /* ── TASKS PAGE ── */
 .tasks-header {
   display: flex;
-  align-items: baseline;
-  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   margin-bottom: 20px;
+}
+
+.tasks-header-center {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
 }
 
 .tasks-header h2 { font-size: 28px; }

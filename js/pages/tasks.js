@@ -56,11 +56,20 @@ async function renderTasks(container, params = {}) {
     </div>
   ` : '';
 
+  const prevNavYear = month === 0 ? year - 1 : year;
+  const prevNavMonth = month === 0 ? 11 : month - 1;
+  const nextNavYear = month === 11 ? year + 1 : year;
+  const nextNavMonth = month === 11 ? 0 : month + 1;
+
   container.innerHTML = `
     <div class="page-tasks">
       <div class="tasks-header">
-        <h2>${MONTH_NAMES[month]}</h2>
-        <span class="tasks-count">${tasks.filter(t=>t.status==='done').length}/${tasks.length}</span>
+        <button class="cal-nav-btn" onclick="navigate('tasks', { year: ${prevNavYear}, month: ${prevNavMonth} })">&#8592;</button>
+        <div class="tasks-header-center">
+          <h2>${MONTH_NAMES[month]}</h2>
+          <span class="tasks-count">${tasks.filter(t=>t.status==='done').length}/${tasks.length}</span>
+        </div>
+        <button class="cal-nav-btn" onclick="navigate('tasks', { year: ${nextNavYear}, month: ${nextNavMonth} })">&#8594;</button>
       </div>
 
       ${migrationHTML}
