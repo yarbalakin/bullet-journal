@@ -11,10 +11,11 @@ async function renderTasks(container, params = {}) {
   const prevMonth = prevDate.getMonth();
   const prevMonthId = `${prevYear}-${String(prevMonth + 1).padStart(2, '0')}`;
 
-  // Show migration only when viewing current or future month
-  const isCurrentOrFuture = new Date(year, month, 1) >= new Date(now.getFullYear(), now.getMonth(), 1);
+  // Show migration only when the previous month is already in the past
+  const prevMonthIsPast = prevYear < now.getFullYear() ||
+    (prevYear === now.getFullYear() && prevMonth < now.getMonth());
   let migrationTasks = [];
-  if (isCurrentOrFuture) {
+  if (prevMonthIsPast) {
     const prevTasks = await dbGetByIndex('tasks', 'monthId', prevMonthId);
     migrationTasks = prevTasks.filter(t => t.status === 'pending');
   }
