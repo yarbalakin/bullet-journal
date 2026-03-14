@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bujo-v14';
+const CACHE_NAME = 'bujo-v15';
 const ASSETS = [
   './',
   './index.html',
@@ -6,6 +6,7 @@ const ASSETS = [
   './js/app.js',
   './js/db.js',
   './js/router.js',
+  './js/sticker-system.js',
   './js/pages/home.js',
   './js/pages/calendar.js',
   './js/pages/tasks.js',
@@ -16,6 +17,7 @@ const ASSETS = [
   './js/pages/collections.js',
   './js/pages/habits.js',
   './js/pages/coverPicker.js',
+  './images/stickers/manifest.json',
   './images/covers/01-january.jpg',
   './images/covers/02-february.jpg',
   './images/covers/03-march.jpg',
@@ -49,6 +51,18 @@ self.addEventListener('fetch', e => {
   if (e.request.url.includes('openbeautyfacts.org') || e.request.url.includes('unpkg.com') || e.request.url.includes('n8n.cloud')) {
     e.respondWith(
       fetch(e.request).catch(() => caches.match(e.request))
+    );
+  } else if (e.request.url.includes('/images/stickers/')) {
+    // Sticker images: cache on first use (lazy caching)
+    e.respondWith(
+      caches.match(e.request).then(r => {
+        if (r) return r;
+        return fetch(e.request).then(res => {
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
+          return res;
+        });
+      })
     );
   } else {
     e.respondWith(

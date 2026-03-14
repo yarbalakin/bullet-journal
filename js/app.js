@@ -13,6 +13,11 @@ async function init() {
     tab.addEventListener('click', () => navigate(tab.dataset.page));
   });
 
+  // Init sticker system
+  if (typeof initStickers === 'function') {
+    await initStickers();
+  }
+
   // Navigate to initial page
   const hash = location.hash.slice(1) || 'home';
   navigate(hash);

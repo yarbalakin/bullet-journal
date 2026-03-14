@@ -22,6 +22,10 @@ function navigate(path, params = {}) {
     content.innerHTML = '';
     handler(content, params);
     history.pushState({ path, params }, '', `#${path}`);
+    // Render stickers overlay after page content
+    if (typeof renderPageStickers === 'function') {
+      setTimeout(renderPageStickers, 50);
+    }
   }
 }
 

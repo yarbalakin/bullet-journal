@@ -1,0 +1,252 @@
+[
+  {
+    "id": "cozy-books",
+    "file": "cozy-books.png",
+    "category": "cozy"
+  },
+  {
+    "id": "cozy-candle",
+    "file": "cozy-candle.png",
+    "category": "cozy"
+  },
+  {
+    "id": "cozy-envelope",
+    "file": "cozy-envelope.png",
+    "category": "cozy"
+  },
+  {
+    "id": "cozy-glasses",
+    "file": "cozy-glasses.png",
+    "category": "cozy"
+  },
+  {
+    "id": "cozy-key",
+    "file": "cozy-key.png",
+    "category": "cozy"
+  },
+  {
+    "id": "cozy-mason-jar",
+    "file": "cozy-mason-jar.png",
+    "category": "cozy"
+  },
+  {
+    "id": "cozy-pen",
+    "file": "cozy-pen.png",
+    "category": "cozy"
+  },
+  {
+    "id": "cozy-scarf",
+    "file": "cozy-scarf.png",
+    "category": "cozy"
+  },
+  {
+    "id": "cozy-teacup",
+    "file": "cozy-teacup.png",
+    "category": "cozy"
+  },
+  {
+    "id": "cozy-yarn",
+    "file": "cozy-yarn.png",
+    "category": "cozy"
+  },
+  {
+    "id": "deco-arrow",
+    "file": "deco-arrow.png",
+    "category": "deco"
+  },
+  {
+    "id": "deco-banner",
+    "file": "deco-banner.png",
+    "category": "deco"
+  },
+  {
+    "id": "deco-cloud",
+    "file": "deco-cloud.png",
+    "category": "deco"
+  },
+  {
+    "id": "deco-heart",
+    "file": "deco-heart.png",
+    "category": "deco"
+  },
+  {
+    "id": "deco-moon",
+    "file": "deco-moon.png",
+    "category": "deco"
+  },
+  {
+    "id": "deco-rainbow",
+    "file": "deco-rainbow.png",
+    "category": "deco"
+  },
+  {
+    "id": "deco-ribbon",
+    "file": "deco-ribbon.png",
+    "category": "deco"
+  },
+  {
+    "id": "deco-stars",
+    "file": "deco-stars.png",
+    "category": "deco"
+  },
+  {
+    "id": "flower-bouquet",
+    "file": "flower-bouquet.png",
+    "category": "flowers"
+  },
+  {
+    "id": "flower-cherry-blossom",
+    "file": "flower-cherry-blossom.png",
+    "category": "flowers"
+  },
+  {
+    "id": "flower-daisy",
+    "file": "flower-daisy.png",
+    "category": "flowers"
+  },
+  {
+    "id": "flower-eucalyptus",
+    "file": "flower-eucalyptus.png",
+    "category": "flowers"
+  },
+  {
+    "id": "flower-fern",
+    "file": "flower-fern.png",
+    "category": "flowers"
+  },
+  {
+    "id": "flower-lavender",
+    "file": "flower-lavender.png",
+    "category": "flowers"
+  },
+  {
+    "id": "flower-lily-valley",
+    "file": "flower-lily-valley.png",
+    "category": "flowers"
+  },
+  {
+    "id": "flower-olive",
+    "file": "flower-olive.png",
+    "category": "flowers"
+  },
+  {
+    "id": "flower-peony",
+    "file": "flower-peony.png",
+    "category": "flowers"
+  },
+  {
+    "id": "flower-poppy",
+    "file": "flower-poppy.png",
+    "category": "flowers"
+  },
+  {
+    "id": "flower-rose",
+    "file": "flower-rose.png",
+    "category": "flowers"
+  },
+  {
+    "id": "flower-sunflower",
+    "file": "flower-sunflower.png",
+    "category": "flowers"
+  },
+  {
+    "id": "food-cake",
+    "file": "food-cake.png",
+    "category": "food"
+  },
+  {
+    "id": "food-cherry",
+    "file": "food-cherry.png",
+    "category": "food"
+  },
+  {
+    "id": "food-croissant",
+    "file": "food-croissant.png",
+    "category": "food"
+  },
+  {
+    "id": "food-honey",
+    "file": "food-honey.png",
+    "category": "food"
+  },
+  {
+    "id": "food-macaron",
+    "file": "food-macaron.png",
+    "category": "food"
+  },
+  {
+    "id": "food-strawberry",
+    "file": "food-strawberry.png",
+    "category": "food"
+  },
+  {
+    "id": "nature-bee",
+    "file": "nature-bee.png",
+    "category": "nature"
+  },
+  {
+    "id": "nature-bird",
+    "file": "nature-bird.png",
+    "category": "nature"
+  },
+  {
+    "id": "nature-butterfly",
+    "file": "nature-butterfly.png",
+    "category": "nature"
+  },
+  {
+    "id": "nature-cat",
+    "file": "nature-cat.png",
+    "category": "nature"
+  },
+  {
+    "id": "nature-fox",
+    "file": "nature-fox.png",
+    "category": "nature"
+  },
+  {
+    "id": "nature-hedgehog",
+    "file": "nature-hedgehog.png",
+    "category": "nature"
+  },
+  {
+    "id": "nature-ladybug",
+    "file": "nature-ladybug.png",
+    "category": "nature"
+  },
+  {
+    "id": "nature-rabbit",
+    "file": "nature-rabbit.png",
+    "category": "nature"
+  },
+  {
+    "id": "season-maple-leaf",
+    "file": "season-maple-leaf.png",
+    "category": "seasonal"
+  },
+  {
+    "id": "season-mittens",
+    "file": "season-mittens.png",
+    "category": "seasonal"
+  },
+  {
+    "id": "season-pumpkin",
+    "file": "season-pumpkin.png",
+    "category": "seasonal"
+  },
+  {
+    "id": "season-seashell",
+    "file": "season-seashell.png",
+    "category": "seasonal"
+  },
+  {
+    "id": "season-snowflake",
+    "file": "season-snowflake.png",
+    "category": "seasonal"
+  },
+  {
+    "id": "season-umbrella",
+    "file": "season-umbrella.png",
+    "category": "seasonal"
+  }
+]
