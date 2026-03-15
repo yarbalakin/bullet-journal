@@ -26,8 +26,12 @@ async function renderCalendar(container, params = {}) {
   // Get moods for this month
   const allMoods = await dbGetAll('moods');
   const monthMoods = {};
+  const monthMoodsList = [];
   allMoods.forEach(m => {
-    if (m.date.startsWith(monthId)) monthMoods[m.date] = m;
+    if (m.date.startsWith(monthId)) {
+      monthMoods[m.date] = m;
+      monthMoodsList.push(m);
+    }
   });
 
   // Get events for this month
@@ -40,7 +44,7 @@ async function renderCalendar(container, params = {}) {
     }
   });
 
-  // Get tasks for this month
+  // Get tasks for this month (ALL statuses for summary)
   const allTasks = await dbGetByIndex('tasks', 'monthId', monthId);
   const dayTasks = {};
   allTasks.forEach(t => {
@@ -89,6 +93,89 @@ async function renderCalendar(container, params = {}) {
 
   const coverImg = COVER_IMAGES[month];
 
+  // ── Mood summary ──
+  let moodSummaryHTML = '';
+  if (monthMoodsList.length > 0) {
+    const moodCounts = {5:0, 4:0, 3:0, 2:0, 1:0};
+    let moodSum = 0;
+    monthMoodsList.forEach(m => { moodCounts[m.level]++; moodSum += m.level; });
+    const avgMood = (moodSum / monthMoodsList.length).toFixed(1);
+    const dominantLevel = Object.entries(moodCounts).sort((a,b) => b[1] - a[1])[0][0];
+    const totalMoods = monthMoodsList.length;
+
+    moodSummaryHTML = `
+      <div class="summary-card">
+        <div class="summary-title">Настроение за месяц</div>
+        <div class="summary-avg">
+          <span class="summary-avg-dot" style="background:${MOOD_COLORS[dominantLevel]}"></span>
+          <span class="summary-avg-label">Среднее: <strong>${avgMood}</strong> / 5</span>
+          <span class="summary-avg-count">${totalMoods} ${totalMoods === 1 ? 'день' : totalMoods < 5 ? 'дня' : 'дней'}</span>
+        </div>
+        <div class="summary-bars">
+          ${[5,4,3,2,1].map(level => {
+            const count = moodCounts[level];
+            const pct = totalMoods ? Math.round(count / totalMoods * 100) : 0;
+            return `<div class="summary-bar-row">
+              <span class="summary-bar-label" style="color:${MOOD_COLORS[level]}">${MOOD_LABELS[level]}</span>
+              <div class="summary-bar-track">
+                <div class="summary-bar-fill" style="width:${pct}%;background:${MOOD_COLORS[level]}"></div>
+              </div>
+              <span class="summary-bar-count">${count}</span>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  // ── Task summary ──
+  let taskSummaryHTML = '';
+  const tasksDone = allTasks.filter(t => t.status === 'done').length;
+  const tasksPending = allTasks.filter(t => t.status === 'pending').length;
+  const tasksMigrated = allTasks.filter(t => t.status === 'migrated').length;
+  const tasksCancelled = allTasks.filter(t => t.status === 'cancelled').length;
+  const tasksTotal = allTasks.length;
+
+  if (tasksTotal > 0) {
+    const donePct = Math.round(tasksDone / tasksTotal * 100);
+    taskSummaryHTML = `
+      <div class="summary-card">
+        <div class="summary-title">Задачи за месяц</div>
+        <div class="summary-tasks-ring">
+          <div class="summary-ring-visual">
+            <svg viewBox="0 0 36 36" class="summary-ring-svg">
+              <path class="summary-ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              <path class="summary-ring-fill" stroke-dasharray="${donePct}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            </svg>
+            <span class="summary-ring-text">${donePct}%</span>
+          </div>
+          <div class="summary-tasks-list">
+            <div class="summary-task-stat">
+              <span class="summary-stat-dot done"></span>
+              <span>Выполнено</span>
+              <strong>${tasksDone}</strong>
+            </div>
+            <div class="summary-task-stat">
+              <span class="summary-stat-dot pending"></span>
+              <span>Ожидает</span>
+              <strong>${tasksPending}</strong>
+            </div>
+            <div class="summary-task-stat">
+              <span class="summary-stat-dot migrated"></span>
+              <span>Перенесено</span>
+              <strong>${tasksMigrated}</strong>
+            </div>
+            <div class="summary-task-stat">
+              <span class="summary-stat-dot cancelled"></span>
+              <span>Отменено</span>
+              <strong>${tasksCancelled}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   container.innerHTML = `
     <div class="page-calendar">
       <div class="cal-bg" style="background-image: url('${coverImg}')"></div>
@@ -119,6 +206,9 @@ async function renderCalendar(container, params = {}) {
       <div class="mood-legend">
         ${[5,4,3,2,1].map(l => `<span class="legend-item"><span class="legend-dot" style="background:${MOOD_COLORS[l]}"></span>${MOOD_LABELS[l]}</span>`).join('')}
       </div>
+
+      ${moodSummaryHTML}
+      ${taskSummaryHTML}
     </div>
   `;
 }
