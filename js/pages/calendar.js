@@ -97,20 +97,12 @@ async function renderCalendar(container, params = {}) {
   let moodSummaryHTML = '';
   if (monthMoodsList.length > 0) {
     const moodCounts = {5:0, 4:0, 3:0, 2:0, 1:0};
-    let moodSum = 0;
-    monthMoodsList.forEach(m => { moodCounts[m.level]++; moodSum += m.level; });
-    const avgMood = (moodSum / monthMoodsList.length).toFixed(1);
-    const dominantLevel = Object.entries(moodCounts).sort((a,b) => b[1] - a[1])[0][0];
+    monthMoodsList.forEach(m => { moodCounts[m.level]++; });
     const totalMoods = monthMoodsList.length;
 
     moodSummaryHTML = `
       <div class="summary-card">
         <div class="summary-title">Настроение за месяц</div>
-        <div class="summary-avg">
-          <span class="summary-avg-dot" style="background:${MOOD_COLORS[dominantLevel]}"></span>
-          <span class="summary-avg-label">Среднее: <strong>${avgMood}</strong> / 5</span>
-          <span class="summary-avg-count">${totalMoods} ${totalMoods === 1 ? 'день' : totalMoods < 5 ? 'дня' : 'дней'}</span>
-        </div>
         <div class="summary-bars">
           ${[5,4,3,2,1].map(level => {
             const count = moodCounts[level];
