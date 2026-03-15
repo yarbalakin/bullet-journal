@@ -80,6 +80,49 @@ async function renderDay(container, params = {}) {
     </div>
   `;
 
+  // 6-Minute Diary
+  const diary = dayNote?.diary || {};
+  const gr = diary.grateful || ['','',''];
+  const mo = diary.moments || ['','',''];
+
+  const diaryHTML = `
+    <div class="day-section diary-section">
+      <div class="day-section-title">6 минут</div>
+
+      <div class="diary-half diary-morning">
+        <div class="diary-half-title diary-morning-title">Утро</div>
+
+        <div class="diary-prompt">За что я благодарна?</div>
+        <input class="diary-input" placeholder="1." value="${escDiary(gr[0])}" onblur="saveDiaryField('${dateStr}','grateful',0,this.value)">
+        <input class="diary-input" placeholder="2." value="${escDiary(gr[1])}" onblur="saveDiaryField('${dateStr}','grateful',1,this.value)">
+        <input class="diary-input" placeholder="3." value="${escDiary(gr[2])}" onblur="saveDiaryField('${dateStr}','grateful',2,this.value)">
+
+        <div class="diary-prompt">Как сделаю день прекрасным?</div>
+        <input class="diary-input" placeholder="Сегодня я..." value="${escDiary(diary.makeGreat)}" onblur="saveDiaryField('${dateStr}','makeGreat',null,this.value)">
+
+        <div class="diary-prompt">Позитивное утверждение</div>
+        <input class="diary-input" placeholder="Я..." value="${escDiary(diary.affirmation)}" onblur="saveDiaryField('${dateStr}','affirmation',null,this.value)">
+      </div>
+
+      <div class="diary-divider"></div>
+
+      <div class="diary-half diary-evening">
+        <div class="diary-half-title diary-evening-title">Вечер</div>
+
+        <div class="diary-prompt">Что хорошего я сделала сегодня?</div>
+        <input class="diary-input" placeholder="Я помогла..." value="${escDiary(diary.goodDeed)}" onblur="saveDiaryField('${dateStr}','goodDeed',null,this.value)">
+
+        <div class="diary-prompt">Что могла бы сделать лучше?</div>
+        <input class="diary-input" placeholder="В следующий раз..." value="${escDiary(diary.couldBetter)}" onblur="saveDiaryField('${dateStr}','couldBetter',null,this.value)">
+
+        <div class="diary-prompt">Прекрасные моменты дня</div>
+        <input class="diary-input" placeholder="1." value="${escDiary(mo[0])}" onblur="saveDiaryField('${dateStr}','moments',0,this.value)">
+        <input class="diary-input" placeholder="2." value="${escDiary(mo[1])}" onblur="saveDiaryField('${dateStr}','moments',1,this.value)">
+        <input class="diary-input" placeholder="3." value="${escDiary(mo[2])}" onblur="saveDiaryField('${dateStr}','moments',2,this.value)">
+      </div>
+    </div>
+  `;
+
   container.innerHTML = `
     <div class="page-day">
       <div class="day-header">
@@ -90,6 +133,7 @@ async function renderDay(container, params = {}) {
         </div>
       </div>
       ${moodHTML}
+      ${diaryHTML}
       ${notesHTML}
       ${eventsHTML}
       ${tasksHTML}
@@ -97,12 +141,40 @@ async function renderDay(container, params = {}) {
   `;
 }
 
+function escDiary(v) {
+  if (!v) return '';
+  return v.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+}
+
 async function saveDayNote(dateStr, text) {
-  if (text.trim()) {
-    await dbPut('daynotes', { date: dateStr, text: text.trim() });
+  const existing = await dbGet('daynotes', dateStr) || { date: dateStr };
+  existing.text = text.trim() || undefined;
+  // Keep record if diary has data, otherwise clean up
+  if (existing.text || existing.diary) {
+    await dbPut('daynotes', existing);
   } else {
     await dbDelete('daynotes', dateStr);
   }
+}
+
+async function saveDiaryField(dateStr, field, index, value) {
+  const existing = await dbGet('daynotes', dateStr) || { date: dateStr };
+  if (!existing.diary) {
+    existing.diary = {
+      grateful: ['','',''],
+      makeGreat: '',
+      affirmation: '',
+      goodDeed: '',
+      couldBetter: '',
+      moments: ['','','']
+    };
+  }
+  if (index !== null && index !== undefined) {
+    existing.diary[field][index] = value.trim();
+  } else {
+    existing.diary[field] = value.trim();
+  }
+  await dbPut('daynotes', existing);
 }
 
 async function setMoodDay(dateStr, level) {

@@ -1656,6 +1656,67 @@ h1, h2 {
 
 .day-notes-textarea:focus { border-color: var(--pink); }
 
+/* ── 6-MINUTE DIARY ── */
+.diary-section {
+  padding-bottom: 20px;
+}
+
+.diary-half {
+  padding: 12px 0 8px;
+}
+
+.diary-half-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.diary-morning-title { color: #c08840; }
+.diary-morning-title::before { content: '\2600'; font-size: 14px; }
+
+.diary-evening-title { color: #8070a8; }
+.diary-evening-title::before { content: '\263E'; font-size: 14px; }
+
+.diary-prompt {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  margin: 10px 0 6px;
+}
+
+.diary-prompt:first-of-type { margin-top: 0; }
+
+.diary-input {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  padding: 8px 4px;
+  font-size: 14px;
+  font-family: inherit;
+  background: transparent;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.diary-input:focus { border-color: var(--pink); }
+
+.diary-input::placeholder { color: var(--text3); font-style: italic; }
+
+.diary-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 8px 0;
+  background-image: repeating-linear-gradient(
+    90deg, var(--border2), var(--border2) 6px, transparent 6px, transparent 12px
+  );
+  background-color: transparent;
+}
+
 /* ── MONTHLY SUMMARY CARDS ── */
 .summary-card {
   background: var(--surface);
