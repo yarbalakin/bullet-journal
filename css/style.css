@@ -196,6 +196,7 @@ h1, h2 {
 /* ── CALENDAR PAGE ── */
 .page-calendar {
   position: relative;
+  padding-bottom: 60px;
 }
 
 .cal-bg {
