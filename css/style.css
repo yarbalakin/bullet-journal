@@ -1707,6 +1707,29 @@ h1, h2 {
 
 .diary-input::placeholder { color: var(--text3); font-style: italic; }
 
+.diary-list-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.diary-list-num {
+  font-size: 14px;
+  color: var(--text2);
+  font-weight: 500;
+  padding-top: 8px;
+  flex-shrink: 0;
+  min-width: 24px;
+  text-align: right;
+}
+
+.diary-list-textarea {
+  resize: none;
+  overflow: hidden;
+  min-height: 34px;
+  line-height: 1.4;
+}
+
 .diary-divider {
   height: 1px;
   background: var(--border);

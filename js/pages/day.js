@@ -95,7 +95,14 @@ async function renderDay(container, params = {}) {
     const rows = [...items];
     if (rows[rows.length - 1] !== '') rows.push('');
     return rows.map((v, i) =>
-      `<input class="diary-input" placeholder="${i + 1}." value="${escDiary(v)}" onblur="saveDiaryListField('${dateStr}','${field}',${i},this.value)">`
+      `<div class="diary-list-row">
+        <span class="diary-list-num">${i + 1}.</span>
+        <textarea class="diary-input diary-list-textarea" rows="1"
+          placeholder="..."
+          onblur="saveDiaryListField('${dateStr}','${field}',${i},this.value)"
+          onkeydown="diaryListKeydown(event,'${dateStr}','${field}',${i})"
+          oninput="autoResizeTextarea(this)">${escDiary(v)}</textarea>
+      </div>`
     ).join('');
   }
 
@@ -151,6 +158,9 @@ async function renderDay(container, params = {}) {
       ${tasksHTML}
     </div>
   `;
+
+  // Auto-resize textareas that have content
+  setTimeout(initDiaryTextareas, 0);
 }
 
 function escDiary(v) {
@@ -226,6 +236,43 @@ async function saveDiaryListField(dateStr, field, index, value) {
   if (value.trim() !== '') {
     navigate('day', { date: dateStr });
   }
+}
+
+function diaryListKeydown(e, dateStr, field, index) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    // Save current value and re-render (which adds new empty row)
+    const val = e.target.value;
+    saveDiaryListField(dateStr, field, index, val).then(() => {
+      // Focus the next input after re-render
+      setTimeout(() => {
+        const rows = document.querySelectorAll(`.diary-list-textarea`);
+        // Find the row for this field — count textareas in the right section
+        const allLists = document.querySelectorAll('.diary-list-row');
+        let fieldIdx = 0;
+        for (const row of allLists) {
+          const ta = row.querySelector('textarea');
+          if (ta && ta.getAttribute('onblur')?.includes(field)) {
+            if (fieldIdx === index + 1) { ta.focus(); return; }
+            fieldIdx++;
+          }
+        }
+      }, 100);
+    });
+  }
+}
+
+function autoResizeTextarea(el) {
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
+}
+
+// Auto-resize all diary textareas after page render
+function initDiaryTextareas() {
+  document.querySelectorAll('.diary-list-textarea').forEach(el => {
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
+  });
 }
 
 async function setMoodDay(dateStr, level) {
