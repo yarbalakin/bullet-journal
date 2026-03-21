@@ -83,7 +83,21 @@ async function renderDay(container, params = {}) {
   // 6-Minute Diary
   const diary = dayNote?.diary || {};
   const gr = diary.grateful || ['','',''];
-  const mo = diary.moments || ['','',''];
+  // Migrate old formats: string → array
+  let mg = diary.makeGreat;
+  if (typeof mg === 'string') mg = mg ? [mg] : [''];
+  if (!Array.isArray(mg) || mg.length === 0) mg = [''];
+  let mo = diary.moments;
+  if (!Array.isArray(mo) || mo.length === 0) mo = [''];
+
+  function diaryListInputs(field, items) {
+    // Always show one extra empty row for adding new items
+    const rows = [...items];
+    if (rows[rows.length - 1] !== '') rows.push('');
+    return rows.map((v, i) =>
+      `<input class="diary-input" placeholder="${i + 1}." value="${escDiary(v)}" onblur="saveDiaryListField('${dateStr}','${field}',${i},this.value)">`
+    ).join('');
+  }
 
   const diaryHTML = `
     <div class="day-section diary-section">
@@ -97,10 +111,10 @@ async function renderDay(container, params = {}) {
         <input class="diary-input" placeholder="2." value="${escDiary(gr[1])}" onblur="saveDiaryField('${dateStr}','grateful',1,this.value)">
         <input class="diary-input" placeholder="3." value="${escDiary(gr[2])}" onblur="saveDiaryField('${dateStr}','grateful',2,this.value)">
 
-        <div class="diary-prompt">Как сделаю день прекрасным?</div>
-        <input class="diary-input" placeholder="Сегодня я..." value="${escDiary(diary.makeGreat)}" onblur="saveDiaryField('${dateStr}','makeGreat',null,this.value)">
+        <div class="diary-prompt">Что сделает сегодняшний день замечательным?</div>
+        ${diaryListInputs('makeGreat', mg)}
 
-        <div class="diary-prompt">Позитивное утверждение</div>
+        <div class="diary-prompt">Положительная установка</div>
         <input class="diary-input" placeholder="Я..." value="${escDiary(diary.affirmation)}" onblur="saveDiaryField('${dateStr}','affirmation',null,this.value)">
       </div>
 
@@ -109,16 +123,14 @@ async function renderDay(container, params = {}) {
       <div class="diary-half diary-evening">
         <div class="diary-half-title diary-evening-title">Вечер</div>
 
-        <div class="diary-prompt">Что хорошего я сделала сегодня?</div>
+        <div class="diary-prompt">Что сегодня было сделано хорошего для других?</div>
         <input class="diary-input" placeholder="Я помогла..." value="${escDiary(diary.goodDeed)}" onblur="saveDiaryField('${dateStr}','goodDeed',null,this.value)">
 
-        <div class="diary-prompt">Что могла бы сделать лучше?</div>
+        <div class="diary-prompt">Что я могу сделать завтра лучше?</div>
         <input class="diary-input" placeholder="В следующий раз..." value="${escDiary(diary.couldBetter)}" onblur="saveDiaryField('${dateStr}','couldBetter',null,this.value)">
 
-        <div class="diary-prompt">Прекрасные моменты дня</div>
-        <input class="diary-input" placeholder="1." value="${escDiary(mo[0])}" onblur="saveDiaryField('${dateStr}','moments',0,this.value)">
-        <input class="diary-input" placeholder="2." value="${escDiary(mo[1])}" onblur="saveDiaryField('${dateStr}','moments',1,this.value)">
-        <input class="diary-input" placeholder="3." value="${escDiary(mo[2])}" onblur="saveDiaryField('${dateStr}','moments',2,this.value)">
+        <div class="diary-prompt">Прекрасные события, которые произошли со мной сегодня</div>
+        ${diaryListInputs('moments', mo)}
       </div>
     </div>
   `;
@@ -162,12 +174,16 @@ async function saveDiaryField(dateStr, field, index, value) {
   if (!existing.diary) {
     existing.diary = {
       grateful: ['','',''],
-      makeGreat: '',
+      makeGreat: [''],
       affirmation: '',
       goodDeed: '',
       couldBetter: '',
-      moments: ['','','']
+      moments: ['']
     };
+  }
+  // Migrate old string makeGreat to array
+  if (field === 'makeGreat' && typeof existing.diary.makeGreat === 'string') {
+    existing.diary.makeGreat = existing.diary.makeGreat ? [existing.diary.makeGreat] : [''];
   }
   if (index !== null && index !== undefined) {
     existing.diary[field][index] = value.trim();
@@ -175,6 +191,41 @@ async function saveDiaryField(dateStr, field, index, value) {
     existing.diary[field] = value.trim();
   }
   await dbPut('daynotes', existing);
+}
+
+async function saveDiaryListField(dateStr, field, index, value) {
+  const existing = await dbGet('daynotes', dateStr) || { date: dateStr };
+  if (!existing.diary) {
+    existing.diary = {
+      grateful: ['','',''],
+      makeGreat: [''],
+      affirmation: '',
+      goodDeed: '',
+      couldBetter: '',
+      moments: ['']
+    };
+  }
+  // Migrate old string to array
+  if (typeof existing.diary[field] === 'string') {
+    existing.diary[field] = existing.diary[field] ? [existing.diary[field]] : [''];
+  }
+  if (!Array.isArray(existing.diary[field])) existing.diary[field] = [''];
+
+  // Expand array if needed
+  while (existing.diary[field].length <= index) existing.diary[field].push('');
+  existing.diary[field][index] = value.trim();
+
+  // Trim trailing empty items but keep at least one
+  while (existing.diary[field].length > 1 && existing.diary[field][existing.diary[field].length - 1] === '') {
+    existing.diary[field].pop();
+  }
+
+  await dbPut('daynotes', existing);
+
+  // Re-render if user filled the last row (to show new empty row)
+  if (value.trim() !== '') {
+    navigate('day', { date: dateStr });
+  }
 }
 
 async function setMoodDay(dateStr, level) {
