@@ -114,15 +114,15 @@ async function renderDay(container, params = {}) {
         <div class="diary-half-title diary-morning-title">Утро</div>
 
         <div class="diary-prompt">За что я благодарна?</div>
-        <input class="diary-input" placeholder="1." value="${escDiary(gr[0])}" onblur="saveDiaryField('${dateStr}','grateful',0,this.value)">
-        <input class="diary-input" placeholder="2." value="${escDiary(gr[1])}" onblur="saveDiaryField('${dateStr}','grateful',1,this.value)">
-        <input class="diary-input" placeholder="3." value="${escDiary(gr[2])}" onblur="saveDiaryField('${dateStr}','grateful',2,this.value)">
+        <div class="diary-list-row"><span class="diary-list-num">1.</span><textarea class="diary-input diary-list-textarea" rows="1" placeholder="..." onblur="saveDiaryField('${dateStr}','grateful',0,this.value)" oninput="autoResizeTextarea(this)">${escDiary(gr[0])}</textarea></div>
+        <div class="diary-list-row"><span class="diary-list-num">2.</span><textarea class="diary-input diary-list-textarea" rows="1" placeholder="..." onblur="saveDiaryField('${dateStr}','grateful',1,this.value)" oninput="autoResizeTextarea(this)">${escDiary(gr[1])}</textarea></div>
+        <div class="diary-list-row"><span class="diary-list-num">3.</span><textarea class="diary-input diary-list-textarea" rows="1" placeholder="..." onblur="saveDiaryField('${dateStr}','grateful',2,this.value)" oninput="autoResizeTextarea(this)">${escDiary(gr[2])}</textarea></div>
 
         <div class="diary-prompt">Что сделает сегодняшний день замечательным?</div>
         ${diaryListInputs('makeGreat', mg)}
 
         <div class="diary-prompt">Положительная установка</div>
-        <input class="diary-input" placeholder="Я..." value="${escDiary(diary.affirmation)}" onblur="saveDiaryField('${dateStr}','affirmation',null,this.value)">
+        <textarea class="diary-input diary-list-textarea" rows="1" placeholder="Я..." onblur="saveDiaryField('${dateStr}','affirmation',null,this.value)" oninput="autoResizeTextarea(this)">${escDiary(diary.affirmation)}</textarea>
       </div>
 
       <div class="diary-divider"></div>
@@ -131,10 +131,10 @@ async function renderDay(container, params = {}) {
         <div class="diary-half-title diary-evening-title">Вечер</div>
 
         <div class="diary-prompt">Что сегодня было сделано хорошего для других?</div>
-        <input class="diary-input" placeholder="Я помогла..." value="${escDiary(diary.goodDeed)}" onblur="saveDiaryField('${dateStr}','goodDeed',null,this.value)">
+        <textarea class="diary-input diary-list-textarea" rows="1" placeholder="Я помогла..." onblur="saveDiaryField('${dateStr}','goodDeed',null,this.value)" oninput="autoResizeTextarea(this)">${escDiary(diary.goodDeed)}</textarea>
 
         <div class="diary-prompt">Что я могу сделать завтра лучше?</div>
-        <input class="diary-input" placeholder="В следующий раз..." value="${escDiary(diary.couldBetter)}" onblur="saveDiaryField('${dateStr}','couldBetter',null,this.value)">
+        <textarea class="diary-input diary-list-textarea" rows="1" placeholder="В следующий раз..." onblur="saveDiaryField('${dateStr}','couldBetter',null,this.value)" oninput="autoResizeTextarea(this)">${escDiary(diary.couldBetter)}</textarea>
 
         <div class="diary-prompt">Прекрасные события, которые произошли со мной сегодня</div>
         ${diaryListInputs('moments', mo)}
