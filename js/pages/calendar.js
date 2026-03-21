@@ -201,6 +201,10 @@ async function renderCalendar(container, params = {}) {
 
       ${moodSummaryHTML}
       ${taskSummaryHTML}
+
+      <button class="lw-calendar-btn" onclick="navigate('lifewheel', { year: ${year}, month: ${month} })">
+        Оценить месяц
+      </button>
     </div>
   `;
 }

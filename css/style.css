@@ -2061,6 +2061,205 @@ h1, h2 {
 .sticker-ctrl.delete { color: #d06060; }
 .sticker-ctrl.delete:active { background: #fde8e8; }
 
+/* ── LIFE WHEEL ── */
+.lw-calendar-btn {
+  display: block;
+  width: 100%;
+  margin: 16px 0 0;
+  padding: 14px;
+  background: var(--surface);
+  border: 2px dashed var(--border2);
+  border-radius: 16px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.lw-calendar-btn:active { background: var(--surface2); }
+
+.page-lifewheel {
+  padding: 0 16px 16px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.lw-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--surface2);
+  border-radius: 12px;
+  font-size: 14px;
+  color: var(--text2);
+  margin-bottom: 12px;
+}
+
+.lw-dynamics-btn {
+  padding: 6px 16px;
+  background: var(--pink);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  font-size: 13px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+}
+.lw-dynamics-btn:active { opacity: 0.8; }
+
+.lw-list { display: flex; flex-direction: column; gap: 10px; }
+
+.lw-row {
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+}
+
+.lw-row-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.lw-area-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.lw-delta {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+.lw-up { color: #2e7d32; background: #e8f5e9; }
+.lw-down { color: #c62828; background: #ffebee; }
+.lw-same { color: #7a6860; background: #f5f0ec; }
+
+.lw-buttons {
+  display: flex;
+  gap: 4px;
+}
+
+.lw-btn {
+  flex: 1;
+  height: 32px;
+  border: 1.5px solid var(--border2);
+  border-radius: 8px;
+  background: var(--surface);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.15s;
+  padding: 0;
+}
+.lw-btn:active { transform: scale(0.92); }
+.lw-btn.active {
+  border-color: transparent;
+  font-weight: 700;
+}
+
+.lw-bar-track {
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+.lw-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.lw-bottom-pad { height: 80px; }
+
+/* ── DYNAMICS ── */
+.dyn-list { display: flex; flex-direction: column; gap: 6px; }
+
+.dyn-area {
+  background: var(--surface);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.dyn-area-name {
+  padding: 12px 14px;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  list-style: none;
+}
+.dyn-area-name::-webkit-details-marker { display: none; }
+.dyn-area-name::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-right: 2px solid var(--text2);
+  border-bottom: 2px solid var(--text2);
+  transform: rotate(-45deg);
+  margin-right: 10px;
+  transition: transform 0.2s;
+}
+.dyn-area[open] > .dyn-area-name::before {
+  transform: rotate(45deg);
+}
+
+.dyn-bars { padding: 0 14px 12px; }
+
+.dyn-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 28px;
+}
+
+.dyn-month {
+  width: 52px;
+  font-size: 12px;
+  color: var(--text2);
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.dyn-bar-track {
+  flex: 1;
+  height: 12px;
+  background: var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.dyn-bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.3s ease;
+}
+
+.dyn-bar-val {
+  width: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  text-align: center;
+}
+
+.dyn-no-data {
+  color: var(--text3);
+  font-size: 12px;
+}
+
 /* ── UTILS ── */
 button { -webkit-tap-highlight-color: transparent; }
 input, select, textarea { -webkit-tap-highlight-color: transparent; }
