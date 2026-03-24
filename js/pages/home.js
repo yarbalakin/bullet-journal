@@ -101,6 +101,10 @@ async function renderHome(container) {
             <span class="home-nav-icon">&#9733;</span>
             <span>Коллекции</span>
           </div>
+          <div class="home-nav-item" onclick="navigate('diary')">
+            <span class="home-nav-icon">&#9998;</span>
+            <span>Дневник</span>
+          </div>
         </div>
         <div class="home-sync-row">
           <button class="home-sync-btn" onclick="syncToCloud()">&#9729; Сохранить в облако</button>

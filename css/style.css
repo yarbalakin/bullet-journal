@@ -2298,3 +2298,56 @@ h1, h2 {
 /* ── UTILS ── */
 button { -webkit-tap-highlight-color: transparent; }
 input, select, textarea { -webkit-tap-highlight-color: transparent; }
+
+/* ── DIARY PAGE ── */
+.page-diary { padding-bottom: 40px; }
+
+.diary-page-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.diary-page-header h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 26px;
+  font-weight: 600;
+}
+
+.diary-entries { display: flex; flex-direction: column; gap: 12px; }
+
+.diary-entry {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.diary-entry:active { transform: scale(0.98); background: var(--surface2); }
+
+.diary-entry-date {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--pink-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+
+.diary-entry-text {
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.diary-empty {
+  text-align: center;
+  color: var(--text3);
+  font-size: 14px;
+  padding: 40px 0;
+}
