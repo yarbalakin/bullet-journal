@@ -82,14 +82,14 @@ async function renderTasks(container, params = {}) {
 
       ${dated.length ? `
         <div class="task-group">
-          <div class="task-group-label">С датой</div>
+          <div class="task-group-label">События</div>
           ${dated.map(renderTask).join('')}
         </div>
       ` : ''}
 
       ${undated.length ? `
         <div class="task-group">
-          <div class="task-group-label">Без даты</div>
+          <div class="task-group-label">Задачи</div>
           ${undated.map(renderTask).join('')}
         </div>
       ` : ''}
