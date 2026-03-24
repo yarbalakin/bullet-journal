@@ -15,8 +15,7 @@ async function renderDay(container, params = {}) {
   const allEvents = await dbGetAll('events');
   const dayEvents = allEvents.filter(e => e.date === dateStr).sort((a, b) => (a.time || '').localeCompare(b.time || ''));
   const allTasks = await dbGetByIndex('tasks', 'monthId', monthId);
-  const dayTasks = allTasks.filter(t => t.date === dateStr);
-  const undatedTasks = allTasks.filter(t => !t.date);
+  const pendingTasks = allTasks.filter(t => t.status !== 'done');
   const dayNote = await dbGet('daynotes', dateStr);
 
   // Mood section
@@ -71,13 +70,7 @@ async function renderDay(container, params = {}) {
   const tasksHTML = `
     <div class="day-section">
       <div class="day-section-title">Задачи</div>
-      ${dayTasks.length ? dayTasks.map(renderTaskRow).join('') : ''}
-      ${undatedTasks.length ? `
-        ${dayTasks.length ? '<div class="day-tasks-divider"></div>' : ''}
-        <div class="day-tasks-undated-label">Без даты</div>
-        ${undatedTasks.map(renderTaskRow).join('')}
-      ` : ''}
-      ${!dayTasks.length && !undatedTasks.length ? '<div class="day-empty">Нет задач на этот день</div>' : ''}
+      ${pendingTasks.length ? pendingTasks.map(renderTaskRow).join('') : '<div class="day-empty">Нет задач на этот месяц</div>'}
     </div>
   `;
 
