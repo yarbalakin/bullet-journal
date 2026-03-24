@@ -901,6 +901,18 @@ h1, h2 {
   font-size: 13px;
   font-style: italic;
 }
+.day-tasks-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 8px 0;
+}
+.day-tasks-undated-label {
+  font-size: 11px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 2px 0 6px;
+}
 
 /* Color picker */
 .color-picker {

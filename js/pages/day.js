@@ -16,6 +16,7 @@ async function renderDay(container, params = {}) {
   const dayEvents = allEvents.filter(e => e.date === dateStr).sort((a, b) => (a.time || '').localeCompare(b.time || ''));
   const allTasks = await dbGetByIndex('tasks', 'monthId', monthId);
   const dayTasks = allTasks.filter(t => t.date === dateStr);
+  const undatedTasks = allTasks.filter(t => !t.date);
   const dayNote = await dbGet('daynotes', dateStr);
 
   // Mood section
@@ -57,18 +58,26 @@ async function renderDay(container, params = {}) {
   `;
 
   // Tasks section
+  const renderTaskRow = (t) => `
+    <div class="task-row ${t.status === 'done' ? 'done' : ''}">
+      <button class="task-check ${t.status === 'done' ? 'checked' : ''}"
+              onclick="toggleTaskDay(${t.id}, '${t.status}', '${dateStr}')">
+        ${t.status === 'done' ? '&#10003;' : ''}
+      </button>
+      <span class="task-text">${t.title}</span>
+    </div>
+  `;
+
   const tasksHTML = `
     <div class="day-section">
       <div class="day-section-title">Задачи</div>
-      ${dayTasks.length ? dayTasks.map(t => `
-        <div class="task-row ${t.status === 'done' ? 'done' : ''}">
-          <button class="task-check ${t.status === 'done' ? 'checked' : ''}"
-                  onclick="toggleTaskDay(${t.id}, '${t.status}', '${dateStr}')">
-            ${t.status === 'done' ? '&#10003;' : ''}
-          </button>
-          <span class="task-text">${t.title}</span>
-        </div>
-      `).join('') : '<div class="day-empty">Нет задач на этот день</div>'}
+      ${dayTasks.length ? dayTasks.map(renderTaskRow).join('') : ''}
+      ${undatedTasks.length ? `
+        ${dayTasks.length ? '<div class="day-tasks-divider"></div>' : ''}
+        <div class="day-tasks-undated-label">Без даты</div>
+        ${undatedTasks.map(renderTaskRow).join('')}
+      ` : ''}
+      ${!dayTasks.length && !undatedTasks.length ? '<div class="day-empty">Нет задач на этот день</div>' : ''}
     </div>
   `;
 
