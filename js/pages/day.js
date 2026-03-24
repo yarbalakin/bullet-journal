@@ -203,7 +203,7 @@ async function saveDiaryField(dateStr, field, index, value) {
   await dbPut('daynotes', existing);
 }
 
-async function saveDiaryListField(dateStr, field, index, value) {
+async function saveDiaryListField(dateStr, field, index, value, skipNavigate = false) {
   const existing = await dbGet('daynotes', dateStr) || { date: dateStr };
   if (!existing.diary) {
     existing.diary = {
@@ -232,8 +232,7 @@ async function saveDiaryListField(dateStr, field, index, value) {
 
   await dbPut('daynotes', existing);
 
-  // Re-render if user filled the last row (to show new empty row)
-  if (value.trim() !== '') {
+  if (value.trim() !== '' && !skipNavigate) {
     navigate('day', { date: dateStr });
   }
 }
@@ -241,23 +240,32 @@ async function saveDiaryListField(dateStr, field, index, value) {
 function diaryListKeydown(e, dateStr, field, index) {
   if (e.key === 'Enter') {
     e.preventDefault();
-    // Save current value and re-render (which adds new empty row)
     const val = e.target.value;
-    saveDiaryListField(dateStr, field, index, val).then(() => {
-      // Focus the next input after re-render
-      setTimeout(() => {
-        const rows = document.querySelectorAll(`.diary-list-textarea`);
-        // Find the row for this field — count textareas in the right section
-        const allLists = document.querySelectorAll('.diary-list-row');
-        let fieldIdx = 0;
-        for (const row of allLists) {
-          const ta = row.querySelector('textarea');
-          if (ta && ta.getAttribute('onblur')?.includes(field)) {
-            if (fieldIdx === index + 1) { ta.focus(); return; }
-            fieldIdx++;
-          }
-        }
-      }, 100);
+    saveDiaryListField(dateStr, field, index, val, true).then(() => {
+      const currentRow = e.target.closest('.diary-list-row');
+      const parent = currentRow.parentElement;
+      const fieldRows = [...parent.querySelectorAll('.diary-list-row')]
+        .filter(r => r.querySelector('textarea')?.getAttribute('onblur')?.includes(`'${field}'`));
+      const currentIdx = fieldRows.indexOf(currentRow);
+      const isLast = currentIdx === fieldRows.length - 1;
+
+      if (isLast && val.trim() !== '') {
+        // Add new row without page re-render
+        const newIndex = index + 1;
+        const newRow = document.createElement('div');
+        newRow.className = 'diary-list-row';
+        newRow.innerHTML =
+          `<span class="diary-list-num">${newIndex + 1}.</span>` +
+          `<textarea class="diary-input diary-list-textarea" rows="1" placeholder="..."` +
+          ` onblur="saveDiaryListField('${dateStr}','${field}',${newIndex},this.value)"` +
+          ` onkeydown="diaryListKeydown(event,'${dateStr}','${field}',${newIndex})"` +
+          ` oninput="autoResizeTextarea(this)"></textarea>`;
+        parent.appendChild(newRow);
+        setTimeout(() => newRow.querySelector('textarea').focus(), 30);
+      } else if (!isLast) {
+        // Move to next existing row
+        setTimeout(() => fieldRows[currentIdx + 1]?.querySelector('textarea')?.focus(), 30);
+      }
     });
   }
 }
