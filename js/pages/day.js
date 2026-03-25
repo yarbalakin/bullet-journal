@@ -326,6 +326,9 @@ function showAddEvent(dateStr) {
         <label class="form-label">Название
           <input type="text" name="title" class="form-input" placeholder="Встреча с подругой" required>
         </label>
+        <label class="form-label">Дата
+          <input type="date" name="eventDate" class="form-input" value="${dateStr}" required>
+        </label>
         <label class="form-label">Время
           <input type="time" name="time" class="form-input">
         </label>
@@ -347,8 +350,9 @@ function showAddEvent(dateStr) {
 async function saveEvent(e, dateStr) {
   e.preventDefault();
   const fd = new FormData(e.target);
+  const eventDate = fd.get('eventDate') || dateStr;
   await dbPut('events', {
-    date: dateStr,
+    date: eventDate,
     title: fd.get('title'),
     time: fd.get('time') || null,
     place: fd.get('place') || null,
@@ -356,7 +360,7 @@ async function saveEvent(e, dateStr) {
     color: fd.get('color') || EVENT_COLORS[0],
     createdAt: new Date().toISOString(),
   });
-  navigate('day', { date: dateStr });
+  navigate('day', { date: eventDate });
 }
 
 route('day', renderDay);
