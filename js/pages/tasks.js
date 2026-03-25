@@ -28,6 +28,12 @@ async function renderTasks(container, params = {}) {
   const dated = tasks.filter(t => t.date).sort((a, b) => a.date.localeCompare(b.date));
   const undated = tasks.filter(t => !t.date);
 
+  // Load events for this month from events store
+  const allEvents = await dbGetAll('events');
+  const monthEvents = allEvents
+    .filter(e => e.date && e.date.startsWith(monthId))
+    .sort((a, b) => a.date.localeCompare(b.date) || (a.time || '').localeCompare(b.time || ''));
+
   const renderTask = t => `
     <div class="task-row ${t.status === 'done' ? 'done' : ''}" data-id="${t.id}">
       <button class="task-check ${t.status === 'done' ? 'checked' : ''}"
@@ -80,9 +86,17 @@ async function renderTasks(container, params = {}) {
         <button type="submit" class="task-add-btn">+</button>
       </form>
 
-      ${dated.length ? `
+      ${(dated.length || monthEvents.length) ? `
         <div class="task-group">
           <div class="task-group-label">События</div>
+          ${monthEvents.map(e => `
+            <div class="task-row" data-id="ev-${e.id}">
+              <span class="day-event-color" style="background:${e.color || 'var(--lavender)'}; width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px; flex-shrink:0"></span>
+              <span class="task-text">${e.title}${e.time ? ' · ' + e.time : ''}</span>
+              <span class="task-date">${e.date.slice(8)}.${e.date.slice(5,7)}</span>
+              <button class="task-delete" onclick="deleteEventFromTasks(${e.id}, ${year}, ${month})">&times;</button>
+            </div>
+          `).join('')}
           ${dated.map(renderTask).join('')}
         </div>
       ` : ''}
@@ -152,6 +166,11 @@ async function cancelTask(id, toYear, toMonth) {
   task.status = 'cancelled';
   await dbPut('tasks', task);
   navigate('tasks', { year: toYear, month: toMonth });
+}
+
+async function deleteEventFromTasks(id, year, month) {
+  await dbDelete('events', id);
+  navigate('tasks', { year, month });
 }
 
 route('tasks', renderTasks);
