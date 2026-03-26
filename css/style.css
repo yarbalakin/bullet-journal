@@ -574,6 +574,144 @@ h1, h2 {
 
 .task-delete:hover { opacity: 1; color: #d08080; }
 
+.task-edit {
+  background: none;
+  border: none;
+  color: var(--text3);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px;
+  opacity: 0.4;
+  transition: opacity 0.15s;
+  font-family: inherit;
+}
+
+.task-edit:hover { opacity: 1; color: var(--pink-dark); }
+
+.event-editable { cursor: pointer; }
+.event-editable:hover { color: var(--pink-dark); }
+
+/* ── TYPE CHOICE MODAL ── */
+.type-choice-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(61,47,42,0.4);
+  display: none;
+  align-items: flex-end;
+}
+
+.type-choice-overlay.active { display: flex; }
+
+.type-choice-sheet {
+  width: 100%;
+  background: var(--surface);
+  border-radius: var(--radius) var(--radius) 0 0;
+  padding: 24px 20px calc(20px + env(safe-area-inset-bottom, 0px));
+}
+
+.type-choice-title {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text3);
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.type-choice-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.type-choice-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 12px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.type-choice-btn:active { background: var(--surface3); }
+
+.type-choice-btn-event {
+  border-color: var(--pink);
+  color: var(--pink-dark);
+}
+
+.type-choice-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+/* ── EVENT MODAL ── */
+.event-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(61,47,42,0.5);
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.event-modal-overlay.active { display: flex; }
+
+.event-modal {
+  width: 100%;
+  max-width: 480px;
+  max-height: 92vh;
+  overflow-y: auto;
+  background: var(--bg);
+  border-radius: var(--radius) var(--radius) 0 0;
+  padding: 0 0 calc(16px + env(safe-area-inset-bottom, 0px));
+}
+
+.event-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  z-index: 1;
+}
+
+.event-modal-header h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.event-modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--text3);
+  cursor: pointer;
+  padding: 4px 8px;
+  line-height: 1;
+  font-family: inherit;
+}
+
+.event-modal-form {
+  padding: 20px;
+}
+
 /* ── COSMETICS PAGE ── */
 .cosm-header {
   display: flex;
