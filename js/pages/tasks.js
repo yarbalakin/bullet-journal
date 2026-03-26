@@ -40,8 +40,9 @@ async function renderTasks(container, params = {}) {
               onclick="toggleTask(${t.id}, '${t.status}', ${year}, ${month})">
         ${t.status === 'done' ? '&#10003;' : ''}
       </button>
-      <span class="task-text">${t.title}</span>
+      <span class="task-text event-editable" onclick="showEditTaskModal(${t.id}, ${year}, ${month})">${t.title}</span>
       ${t.date ? `<span class="task-date">${t.date.slice(8)}.${t.date.slice(5,7)}</span>` : ''}
+      <button class="task-edit" onclick="showEditTaskModal(${t.id}, ${year}, ${month})" title="Редактировать">&#9998;</button>
       <button class="task-delete" onclick="deleteTask(${t.id}, ${year}, ${month})">&times;</button>
     </div>
   `;
@@ -248,6 +249,45 @@ async function showEditEventModal(id, year, month) {
   const ev = await dbGet('events', id);
   if (!ev) return;
   showEventModal(ev, ev.date, year, month);
+}
+
+// ============================================================
+// Модальное окно редактирования задачи
+// ============================================================
+
+async function showEditTaskModal(id, year, month) {
+  const task = await dbGet('tasks', id);
+  if (!task) return;
+
+  document.getElementById('event-modal-content').innerHTML = `
+    <div class="event-modal-header">
+      <h3>Редактировать задачу</h3>
+      <button class="event-modal-close" onclick="hideEventModal()">&times;</button>
+    </div>
+    <form class="cosm-form event-modal-form" onsubmit="updateTaskFromModal(event, ${id}, ${year}, ${month})">
+      <label class="form-label">Название
+        <input type="text" name="title" class="form-input" value="${task.title.replace(/"/g, '&quot;')}" required>
+      </label>
+      <label class="form-label">Дата (необязательно)
+        <input type="date" name="date" class="form-input" value="${task.date || ''}">
+      </label>
+      <button type="submit" class="form-submit">Сохранить</button>
+    </form>
+  `;
+
+  document.getElementById('event-modal-overlay').classList.add('active');
+}
+
+async function updateTaskFromModal(e, id, year, month) {
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const task = await dbGet('tasks', id);
+  if (!task) return;
+  task.title = fd.get('title').trim();
+  task.date = fd.get('date') || null;
+  await dbPut('tasks', task);
+  hideEventModal();
+  navigate('tasks', { year, month });
 }
 
 async function saveEventFromTasks(e, year, month) {
