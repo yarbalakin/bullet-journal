@@ -24,9 +24,21 @@ async function renderTasks(container, params = {}) {
   // Hide migrated/cancelled tasks from display
   const tasks = allTasks.filter(t => t.status !== 'migrated' && t.status !== 'cancelled');
 
+  // Group tasks migrated into this month by their source month
+  const migratedIn = tasks.filter(t => t.migratedFrom);
+  const migratedInBySource = {};
+  for (const t of migratedIn) {
+    const src = t.migratedFrom;
+    if (!migratedInBySource[src]) migratedInBySource[src] = [];
+    migratedInBySource[src].push(t);
+  }
+
+  // Regular tasks (not migrated from another month)
+  const regularTasks = tasks.filter(t => !t.migratedFrom);
+
   // Split into dated and undated
-  const dated = tasks.filter(t => t.date).sort((a, b) => a.date.localeCompare(b.date));
-  const undated = tasks.filter(t => !t.date);
+  const dated = regularTasks.filter(t => t.date).sort((a, b) => a.date.localeCompare(b.date));
+  const undated = regularTasks.filter(t => !t.date);
 
   // Load events for this month from events store
   const allEvents = await dbGetAll('events');
@@ -41,6 +53,7 @@ async function renderTasks(container, params = {}) {
         ${t.status === 'done' ? '&#10003;' : ''}
       </button>
       <span class="task-text event-editable" onclick="showEditTaskModal(${t.id}, ${year}, ${month})">${t.title}</span>
+      ${t.migrateCount ? `<span class="task-migrate-count">&times;${t.migrateCount}</span>` : ''}
       ${t.date ? `<span class="task-date">${t.date.slice(8)}.${t.date.slice(5,7)}</span>` : ''}
       <button class="task-edit" onclick="showEditTaskModal(${t.id}, ${year}, ${month})" title="Редактировать">&#9998;</button>
       <button class="task-delete" onclick="deleteTask(${t.id}, ${year}, ${month})">&times;</button>
@@ -63,10 +76,27 @@ async function renderTasks(container, params = {}) {
     </div>
   ` : '';
 
+  // Build "Перенесено из [месяц]" blocks for each source month
+  const migratedInHTML = Object.entries(migratedInBySource)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([srcMonthId, srcTasks]) => {
+      const [srcYear, srcMonNum] = srcMonthId.split('-').map(Number);
+      const srcMonthName = MONTH_NAMES[srcMonNum - 1];
+      return `
+        <div class="task-group transferred-group">
+          <div class="task-group-label transferred-label">&#8594; Перенесено из ${srcMonthName}</div>
+          ${srcTasks.map(renderTask).join('')}
+        </div>
+      `;
+    }).join('');
+
   const prevNavYear = month === 0 ? year - 1 : year;
   const prevNavMonth = month === 0 ? 11 : month - 1;
   const nextNavYear = month === 11 ? year + 1 : year;
   const nextNavMonth = month === 11 ? 0 : month + 1;
+
+  const totalDone = tasks.filter(t => t.status === 'done').length;
+  const totalCount = tasks.length;
 
   container.innerHTML = `
     <div class="page-tasks">
@@ -74,12 +104,14 @@ async function renderTasks(container, params = {}) {
         <button class="cal-nav-btn" onclick="navigate('tasks', { year: ${prevNavYear}, month: ${prevNavMonth} })">&#8592;</button>
         <div class="tasks-header-center">
           <h2>${MONTH_NAMES[month]}</h2>
-          <span class="tasks-count">${tasks.filter(t=>t.status==='done').length}/${tasks.length}</span>
+          <span class="tasks-count">${totalDone}/${totalCount}</span>
         </div>
         <button class="cal-nav-btn" onclick="navigate('tasks', { year: ${nextNavYear}, month: ${nextNavMonth} })">&#8594;</button>
       </div>
 
       ${migrationHTML}
+
+      ${migratedInHTML}
 
       <form class="task-add" id="task-form" onsubmit="addTask(event, '${monthId}', ${year}, ${month})">
         <input type="text" class="task-input" id="task-input" placeholder="Новая задача..." required>
@@ -362,7 +394,7 @@ async function migrateTask(id, toYear, toMonth) {
   // Mark original as migrated
   task.status = 'migrated';
   await dbPut('tasks', task);
-  // Create copy in target month
+  // Create copy in target month, incrementing the transfer counter
   const toMonthId = `${toYear}-${String(toMonth + 1).padStart(2, '0')}`;
   await dbPut('tasks', {
     monthId: toMonthId,
@@ -371,6 +403,7 @@ async function migrateTask(id, toYear, toMonth) {
     status: 'pending',
     createdAt: new Date().toISOString(),
     migratedFrom: task.monthId,
+    migrateCount: (task.migrateCount || 0) + 1,
   });
   navigate('tasks', { year: toYear, month: toMonth });
 }

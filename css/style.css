@@ -427,6 +427,35 @@ h1, h2 {
   color: #a06060;
 }
 
+/* ── TRANSFERRED TASKS BLOCK ── */
+.transferred-group {
+  background: #f5f2fc;
+  border: 1px solid var(--lavender);
+  border-radius: var(--radius-sm);
+  padding: 0 14px;
+  margin-bottom: 16px;
+}
+
+.transferred-label {
+  color: #7060a8;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 10px 0 8px;
+  margin-bottom: 0;
+}
+
+.task-migrate-count {
+  font-size: 11px;
+  font-weight: 700;
+  color: #7060a8;
+  background: #e0d8f8;
+  border-radius: 10px;
+  padding: 1px 6px;
+  flex-shrink: 0;
+  margin-right: 2px;
+}
+
 /* ── TASKS PAGE ── */
 .tasks-header {
   display: flex;
