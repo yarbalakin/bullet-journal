@@ -24,3 +24,17 @@ async function init() {
 }
 
 document.addEventListener('DOMContentLoaded', init);
+
+async function updateApp() {
+  if ('serviceWorker' in navigator) {
+    const reg = await navigator.serviceWorker.getRegistration();
+    if (reg) {
+      await reg.update();
+      // If a new SW is waiting — activate it immediately
+      if (reg.waiting) {
+        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+      }
+    }
+  }
+  location.reload(true);
+}

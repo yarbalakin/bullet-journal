@@ -110,6 +110,7 @@ async function renderHome(container) {
           <button class="home-sync-btn" onclick="syncToCloud()">&#9729; Сохранить в облако</button>
           <button class="home-sync-btn secondary" onclick="restoreFromCloud()">&#8635; Восстановить</button>
           <button class="home-sync-btn secondary" onclick="exportData()">&#8675; JSON-бэкап</button>
+          <button class="home-sync-btn secondary" onclick="updateApp()">&#8593; Обновить приложение</button>
         </div>
       </div>
     </div>
