@@ -25,7 +25,7 @@ async function renderTasks(container, params = {}) {
   const tasks = allTasks.filter(t => t.status !== 'migrated' && t.status !== 'cancelled');
 
   // Group tasks migrated into this month by their source month
-  const migratedIn = tasks.filter(t => t.migratedFrom);
+  const migratedIn = tasks.filter(t => t.migratedFrom && t.status !== 'done');
   const migratedInBySource = {};
   for (const t of migratedIn) {
     const src = t.migratedFrom;
@@ -36,15 +36,22 @@ async function renderTasks(container, params = {}) {
   // Regular tasks (not migrated from another month)
   const regularTasks = tasks.filter(t => !t.migratedFrom);
 
-  // Split into dated and undated
-  const dated = regularTasks.filter(t => t.date).sort((a, b) => a.date.localeCompare(b.date));
-  const undated = regularTasks.filter(t => !t.date);
+  // Split into pending and done
+  const pendingRegular = regularTasks.filter(t => t.status !== 'done');
+  const doneTasks = tasks.filter(t => t.status === 'done');
+
+  // Split pending regular into dated and undated
+  const dated = pendingRegular.filter(t => t.date).sort((a, b) => a.date.localeCompare(b.date));
+  const undated = pendingRegular.filter(t => !t.date);
 
   // Load events for this month from events store
   const allEvents = await dbGetAll('events');
   const monthEvents = allEvents
     .filter(e => e.date && e.date.startsWith(monthId))
     .sort((a, b) => a.date.localeCompare(b.date) || (a.time || '').localeCompare(b.time || ''));
+
+  const pendingEvents = monthEvents.filter(e => e.status !== 'done');
+  const doneEvents = monthEvents.filter(e => e.status === 'done');
 
   const renderTask = t => `
     <div class="task-row ${t.status === 'done' ? 'done' : ''}" data-id="${t.id}">
@@ -57,6 +64,20 @@ async function renderTasks(container, params = {}) {
       ${t.date ? `<span class="task-date">${t.date.slice(8)}.${t.date.slice(5,7)}</span>` : ''}
       <button class="task-edit" onclick="showEditTaskModal(${t.id}, ${year}, ${month})" title="Редактировать">&#9998;</button>
       <button class="task-delete" onclick="deleteTask(${t.id}, ${year}, ${month})">&times;</button>
+    </div>
+  `;
+
+  const renderEvent = e => `
+    <div class="task-row ${e.status === 'done' ? 'done' : ''}" data-id="ev-${e.id}">
+      <button class="task-check ${e.status === 'done' ? 'checked' : ''}"
+              onclick="toggleEvent(${e.id}, '${e.status || 'pending'}', ${year}, ${month})">
+        ${e.status === 'done' ? '&#10003;' : ''}
+      </button>
+      <span class="day-event-color" style="background:${e.color || 'var(--lavender)'}; width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px; flex-shrink:0"></span>
+      <span class="task-text event-editable" onclick="showEditEventModal(${e.id}, ${year}, ${month})">${e.title}${e.time ? ' · ' + e.time : ''}</span>
+      <span class="task-date">${e.date.slice(8)}.${e.date.slice(5,7)}</span>
+      <button class="task-edit" onclick="showEditEventModal(${e.id}, ${year}, ${month})" title="Редактировать">&#9998;</button>
+      <button class="task-delete" onclick="deleteEventFromTasks(${e.id}, ${year}, ${month})">&times;</button>
     </div>
   `;
 
@@ -95,8 +116,16 @@ async function renderTasks(container, params = {}) {
   const nextNavYear = month === 11 ? year + 1 : year;
   const nextNavMonth = month === 11 ? 0 : month + 1;
 
-  const totalDone = tasks.filter(t => t.status === 'done').length;
-  const totalCount = tasks.length;
+  const totalDone = doneTasks.length + doneEvents.length;
+  const totalCount = tasks.length + monthEvents.length;
+
+  const doneHTML = (doneTasks.length || doneEvents.length) ? `
+    <div class="task-group">
+      <div class="task-group-label">Завершено</div>
+      ${doneEvents.map(renderEvent).join('')}
+      ${doneTasks.map(renderTask).join('')}
+    </div>
+  ` : '';
 
   container.innerHTML = `
     <div class="page-tasks">
@@ -109,40 +138,34 @@ async function renderTasks(container, params = {}) {
         <button class="cal-nav-btn" onclick="navigate('tasks', { year: ${nextNavYear}, month: ${nextNavMonth} })">&#8594;</button>
       </div>
 
-      ${migrationHTML}
-
-      ${migratedInHTML}
-
       <form class="task-add" id="task-form" onsubmit="addTask(event, '${monthId}', ${year}, ${month})">
         <input type="text" class="task-input" id="task-input" placeholder="Новая задача..." required>
         <input type="date" class="task-date-input" id="task-date-input">
         <button type="button" class="task-add-btn" onclick="showTypeChoice('${monthId}', ${year}, ${month})">+</button>
       </form>
 
-      ${(dated.length || monthEvents.length) ? `
+      ${(pendingEvents.length) ? `
         <div class="task-group">
           <div class="task-group-label">События</div>
-          ${monthEvents.map(e => `
-            <div class="task-row" data-id="ev-${e.id}">
-              <span class="day-event-color" style="background:${e.color || 'var(--lavender)'}; width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:6px; flex-shrink:0"></span>
-              <span class="task-text event-editable" onclick="showEditEventModal(${e.id}, ${year}, ${month})">${e.title}${e.time ? ' · ' + e.time : ''}</span>
-              <span class="task-date">${e.date.slice(8)}.${e.date.slice(5,7)}</span>
-              <button class="task-edit" onclick="showEditEventModal(${e.id}, ${year}, ${month})" title="Редактировать">&#9998;</button>
-              <button class="task-delete" onclick="deleteEventFromTasks(${e.id}, ${year}, ${month})">&times;</button>
-            </div>
-          `).join('')}
-          ${dated.map(renderTask).join('')}
+          ${pendingEvents.map(renderEvent).join('')}
         </div>
       ` : ''}
 
-      ${undated.length ? `
+      ${(dated.length || undated.length) ? `
         <div class="task-group">
           <div class="task-group-label">Задачи</div>
+          ${dated.map(renderTask).join('')}
           ${undated.map(renderTask).join('')}
         </div>
       ` : ''}
 
-      ${!tasks.length && !migrationTasks.length ? '<div class="empty-state">Пока нет задач. Добавь первую!</div>' : ''}
+      ${migratedInHTML}
+
+      ${migrationHTML}
+
+      ${doneHTML}
+
+      ${!tasks.length && !migrationTasks.length && !monthEvents.length ? '<div class="empty-state">Пока нет задач. Добавь первую!</div>' : ''}
     </div>
 
     <!-- Модальное окно выбора типа -->
@@ -332,6 +355,7 @@ async function saveEventFromTasks(e, year, month) {
     place: fd.get('place') || null,
     description: fd.get('description') || null,
     color: fd.get('color') || TASKS_EVENT_COLORS[0],
+    status: 'pending',
     createdAt: new Date().toISOString(),
   });
   hideEventModal();
@@ -379,6 +403,15 @@ async function toggleTask(id, currentStatus, year, month) {
   if (task) {
     task.status = currentStatus === 'done' ? 'pending' : 'done';
     await dbPut('tasks', task);
+  }
+  navigate('tasks', { year, month });
+}
+
+async function toggleEvent(id, currentStatus, year, month) {
+  const ev = await dbGet('events', id);
+  if (ev) {
+    ev.status = currentStatus === 'done' ? 'pending' : 'done';
+    await dbPut('events', ev);
   }
   navigate('tasks', { year, month });
 }
