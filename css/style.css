@@ -2801,3 +2801,43 @@ input, select, textarea { -webkit-tap-highlight-color: transparent; }
   padding: 2px 4px;
   line-height: 1;
 }
+
+/* iOS install hint */
+.install-banner-ios {
+  position: relative;
+  width: 100%;
+}
+
+.install-banner-ios .install-banner-close {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: var(--text3);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.install-banner-ios-text {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.6;
+  text-align: center;
+  padding-right: 16px;
+}
+
+.install-banner-ios-arrow {
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid var(--card);
+  position: absolute;
+  bottom: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 3px 4px rgba(160,120,100,0.15));
+}
