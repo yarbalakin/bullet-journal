@@ -147,8 +147,7 @@ async function exportData() {
   URL.revokeObjectURL(url);
 }
 
-// ── Cloud Sync via n8n ──
-const SYNC_URL = 'https://estateinvest.app.n8n.cloud/webhook/bujo-sync';
+// ── Cloud Sync via Supabase ──
 const STORES = ['months', 'tasks', 'events', 'moods', 'cosmetics', 'streak', 'futurelog', 'collections', 'habits', 'daynotes', 'stickers', 'lifewheel'];
 
 async function getAllData() {
@@ -174,40 +173,55 @@ function showToast(msg, isError) {
   setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, 2500);
 }
 
+async function getSupabaseHeaders() {
+  const { data: { session } } = await getSupabase().auth.getSession();
+  return {
+    'Content-Type': 'application/json',
+    'apikey': SUPABASE_ANON_KEY,
+    'Authorization': `Bearer ${session.access_token}`,
+    'Prefer': 'resolution=merge-duplicates',
+  };
+}
+
 async function syncToCloud() {
   try {
+    const user = getCurrentUser();
+    if (!user) return;
     const data = await getAllData();
-    const res = await fetch(SYNC_URL, {
+    const headers = await getSupabaseHeaders();
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/snapshots`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'save', data }),
+      headers,
+      body: JSON.stringify({ user_id: user.id, data, updated_at: new Date().toISOString() }),
     });
-    const json = await res.json();
-    if (json.ok) {
+    if (res.ok) {
       showToast('Сохранено в облако');
+    } else {
+      throw new Error(await res.text());
     }
   } catch (e) {
     showToast('Ошибка синхронизации', true);
+    console.error('Sync error:', e);
   }
 }
 
 async function restoreFromCloud() {
   try {
-    const res = await fetch(SYNC_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'restore' }),
+    const user = getCurrentUser();
+    if (!user) return;
+    const headers = await getSupabaseHeaders();
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/snapshots?user_id=eq.${user.id}&select=data,updated_at`, {
+      headers,
     });
-    const json = await res.json();
-    if (!json.ok || !json.data) {
+    const rows = await res.json();
+    if (!rows.length || !rows[0].data) {
       alert('Нет данных в облаке');
       return;
     }
-
-    // Clear all stores and import
+    const { data, updated_at } = rows[0];
     const d = await openDB();
     for (const storeName of STORES) {
-      const items = json.data[storeName] || [];
+      const items = data[storeName] || [];
       const tx = d.transaction(storeName, 'readwrite');
       tx.objectStore(storeName).clear();
       for (const item of items) {
@@ -215,8 +229,7 @@ async function restoreFromCloud() {
       }
       await new Promise((ok, fail) => { tx.oncomplete = ok; tx.onerror = fail; });
     }
-
-    alert('Данные восстановлены из облака (' + json.timestamp?.slice(0, 10) + ')');
+    alert('Данные восстановлены из облака (' + updated_at?.slice(0, 10) + ')');
     navigate('home');
   } catch (e) {
     alert('Ошибка восстановления: ' + e.message);
