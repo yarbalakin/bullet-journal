@@ -20,7 +20,13 @@ function navigate(path, params = {}) {
   if (handler) {
     currentPage = path;
     content.innerHTML = '';
-    handler(content, params);
+    const result = handler(content, params);
+    if (result && typeof result.catch === 'function') {
+      result.catch(e => {
+        console.error('Page render error:', path, e);
+        content.innerHTML = `<p style="padding:20px;color:#c05050;font-size:14px">Ошибка: ${e.message}</p>`;
+      });
+    }
     history.pushState({ path, params }, '', `#${path}`);
     // Render stickers overlay after page content
     if (typeof renderPageStickers === 'function') {

@@ -241,6 +241,60 @@ async function restoreFromCloud() {
   }
 }
 
+// ── One-time migration from n8n → Supabase ──
+const N8N_WEBHOOK = 'https://estateinvest.app.n8n.cloud/webhook/bujo-sync';
+
+// Checks if this user has no snapshot in Supabase yet.
+// If so, fetches data from n8n and saves it — then cleans up by syncing to Supabase.
+async function migrateFromN8nIfNeeded() {
+  try {
+    const user = getCurrentUser();
+    if (!user) return;
+
+    // n8n хранит данные только одного пользователя (Катя) — не мигрировать для остальных
+    if (user.email !== 'blood.no.amber@gmail.com') return;
+
+    // Check if Supabase already has data for this user
+    const headers = await getSupabaseHeaders();
+    const checkRes = await fetch(`${SUPABASE_URL}/rest/v1/snapshots?user_id=eq.${user.id}&select=user_id`, { headers });
+    const rows = await checkRes.json();
+    if (rows.length > 0) return; // already migrated
+
+    // No snapshot yet — fetch from n8n
+    showToast('Переносим данные из облака...');
+    const n8nRes = await fetch(N8N_WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'restore' }),
+    });
+    if (!n8nRes.ok) {
+      console.warn('n8n migration: no data or webhook unavailable');
+      return;
+    }
+    const payload = await n8nRes.json();
+    // n8n returns either {data: {...}} or the data directly
+    const data = payload.data || payload;
+    if (!data || typeof data !== 'object') return;
+
+    // Write each store into IndexedDB
+    const d = await openDB();
+    for (const storeName of STORES) {
+      const items = data[storeName];
+      if (!Array.isArray(items) || items.length === 0) continue;
+      const tx = d.transaction(storeName, 'readwrite');
+      tx.objectStore(storeName).clear();
+      for (const item of items) tx.objectStore(storeName).put(item);
+      await new Promise((ok, fail) => { tx.oncomplete = ok; tx.onerror = fail; });
+    }
+
+    // Immediately push to Supabase so future logins skip n8n
+    await syncToCloud();
+    showToast('Данные перенесены');
+  } catch (e) {
+    console.error('n8n migration error:', e);
+  }
+}
+
 // Auto-sync: patch dbPut and dbDelete to trigger cloud sync
 const _origDbPut = dbPut;
 dbPut = async function(store, data) {
