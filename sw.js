@@ -1,9 +1,11 @@
-const CACHE_NAME = 'bujo-v26';
+const CACHE_NAME = 'bujo-v27';
 const ASSETS = [
   './',
   './index.html',
   './css/style.css',
   './js/app.js',
+  './js/auth.js',
+  './js/supabase-config.js',
   './js/db.js',
   './js/router.js',
   './js/sticker-system.js',
