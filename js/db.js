@@ -3,16 +3,19 @@ let DB_NAME = 'bujo'; // будет переименован в 'bujo-{user_id}'
 const DB_VERSION = 6;
 
 let db = null;
+let _openingPromise = null; // защита от race condition
 
 // Вызвать после получения user_id из Supabase Auth
 function initUserDb(userId) {
   DB_NAME = 'bujo-' + userId;
-  db = null; // сбросить кешированный коннект
+  db = null;
+  _openingPromise = null;
 }
 
 function openDB() {
-  return new Promise((resolve, reject) => {
-    if (db) return resolve(db);
+  if (db) return Promise.resolve(db);
+  if (_openingPromise) return _openingPromise;
+  _openingPromise = new Promise((resolve, reject) => {
     const req = indexedDB.open(DB_NAME, DB_VERSION);
 
     req.onupgradeneeded = e => {
@@ -82,9 +85,10 @@ function openDB() {
       }
     };
 
-    req.onsuccess = e => { db = e.target.result; resolve(db); };
-    req.onerror = e => reject(e.target.error);
+    req.onsuccess = e => { db = e.target.result; _openingPromise = null; resolve(db); };
+    req.onerror = e => { _openingPromise = null; reject(e.target.error); };
   });
+  return _openingPromise;
 }
 
 // Generic CRUD helpers
@@ -175,6 +179,7 @@ function showToast(msg, isError) {
 
 async function getSupabaseHeaders() {
   const { data: { session } } = await getSupabase().auth.getSession();
+  if (!session) throw new Error('Нет активной сессии');
   return {
     'Content-Type': 'application/json',
     'apikey': SUPABASE_ANON_KEY,
