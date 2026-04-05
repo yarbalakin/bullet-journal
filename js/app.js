@@ -18,6 +18,9 @@ async function init() {
   // Open DB
   await openDB();
 
+  // One-time migration: pull data from n8n if Supabase snapshot is empty
+  await migrateFromN8nIfNeeded();
+
   // Set up tab navigation
   document.querySelectorAll('.tab').forEach(tab => {
     tab.addEventListener('click', () => navigate(tab.dataset.page));
@@ -28,9 +31,17 @@ async function init() {
     await initStickers();
   }
 
-  // Navigate to initial page
-  const hash = location.hash.slice(1) || 'home';
-  navigate(hash);
+  // Show onboarding on first login, then navigate
+  if (needsOnboarding(user.id)) {
+    document.querySelector('.tab-bar').style.display = 'none';
+    showOnboarding(user.id, () => {
+      document.querySelector('.tab-bar').style.display = '';
+      navigate('home');
+    });
+  } else {
+    const hash = location.hash.slice(1) || 'home';
+    navigate(hash);
+  }
 }
 
 document.addEventListener('DOMContentLoaded', init);

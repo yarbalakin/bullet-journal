@@ -2639,3 +2639,99 @@ input, select, textarea { -webkit-tap-highlight-color: transparent; }
   font-size: 13px;
   color: var(--text3);
 }
+
+/* ── Onboarding ── */
+.onboarding-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(253, 248, 244, 0.96);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 24px;
+}
+
+.onboarding-card {
+  background: var(--card);
+  border-radius: 24px;
+  padding: 40px 28px 32px;
+  max-width: 360px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(160,120,100,0.12);
+  animation: onboarding-in 0.25s ease;
+}
+
+@keyframes onboarding-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.onboarding-icon {
+  font-size: 48px;
+  margin-bottom: 20px;
+  line-height: 1;
+}
+
+.onboarding-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 12px;
+}
+
+.onboarding-text {
+  font-size: 15px;
+  color: var(--text2);
+  line-height: 1.6;
+  margin: 0 0 28px;
+}
+
+.onboarding-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.onboarding-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e0d0c8;
+  transition: background 0.2s;
+}
+
+.onboarding-dot.active {
+  background: var(--pink);
+}
+
+.onboarding-btn {
+  width: 100%;
+  padding: 14px 20px;
+  background: var(--pink);
+  border: none;
+  border-radius: 16px;
+  font-size: 16px;
+  font-family: inherit;
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  margin-bottom: 10px;
+}
+
+.onboarding-btn:hover { opacity: 0.88; }
+
+.onboarding-skip {
+  background: none;
+  border: none;
+  font-size: 14px;
+  color: var(--text3);
+  cursor: pointer;
+  padding: 4px 8px;
+  font-family: inherit;
+}
+
+.onboarding-skip:hover { color: var(--text2); }

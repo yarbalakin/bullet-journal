@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bujo-v27';
+const CACHE_NAME = 'bujo-v29';
 const ASSETS = [
   './',
   './index.html',
@@ -9,6 +9,7 @@ const ASSETS = [
   './js/db.js',
   './js/router.js',
   './js/sticker-system.js',
+  './js/onboarding.js',
   './js/pages/home.js',
   './js/pages/calendar.js',
   './js/pages/tasks.js',
