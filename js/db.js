@@ -1,8 +1,14 @@
 // IndexedDB wrapper for Bullet Journal
-const DB_NAME = 'bujo';
+let DB_NAME = 'bujo'; // будет переименован в 'bujo-{user_id}' после авторизации
 const DB_VERSION = 6;
 
 let db = null;
+
+// Вызвать после получения user_id из Supabase Auth
+function initUserDb(userId) {
+  DB_NAME = 'bujo-' + userId;
+  db = null; // сбросить кешированный коннект
+}
 
 function openDB() {
   return new Promise((resolve, reject) => {

@@ -5,6 +5,16 @@ async function init() {
     navigator.serviceWorker.register('/sw.js').catch(() => {});
   }
 
+  // Check auth — если не залогинен, показать экран входа и остановиться
+  const user = await getUser();
+  if (!user) {
+    showLoginScreen();
+    return;
+  }
+
+  // Namespace IndexedDB по user_id — у каждого свои данные
+  initUserDb(user.id);
+
   // Open DB
   await openDB();
 
