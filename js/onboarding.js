@@ -51,6 +51,7 @@ function showOnboarding(userId, onDone) {
 
     overlay.innerHTML = `
       <div class="onboarding-card">
+        <button class="onboarding-close" id="onboarding-skip" title="Пропустить">&times;</button>
         <div class="onboarding-icon">${slide.icon}</div>
         <h2 class="onboarding-title">${slide.title}</h2>
         <p class="onboarding-text">${slide.text}</p>
@@ -61,6 +62,8 @@ function showOnboarding(userId, onDone) {
         ${current > 0 ? `<button class="onboarding-skip" id="onboarding-back">Назад</button>` : ''}
       </div>
     `;
+
+    document.getElementById('onboarding-skip').addEventListener('click', finish);
 
     document.getElementById('onboarding-next').addEventListener('click', () => {
       if (slide.isLast) {
