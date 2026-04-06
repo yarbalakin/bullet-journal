@@ -85,58 +85,74 @@ function openDB() {
       }
     };
 
-    req.onsuccess = e => { db = e.target.result; _openingPromise = null; resolve(db); };
+    req.onsuccess = e => {
+      db = e.target.result;
+      db.onversionchange = () => { db.close(); db = null; };
+      db.onclose = () => { db = null; };
+      _openingPromise = null;
+      resolve(db);
+    };
     req.onerror = e => { _openingPromise = null; reject(e.target.error); };
   });
   return _openingPromise;
 }
 
+// Retry helper — reopens DB if connection was closed by browser (iOS Safari background)
+async function withDB(fn) {
+  let d = await openDB();
+  try {
+    return await fn(d);
+  } catch (e) {
+    if (e.name === 'InvalidStateError') {
+      db = null;
+      d = await openDB();
+      return await fn(d);
+    }
+    throw e;
+  }
+}
+
 // Generic CRUD helpers
-async function dbPut(store, data) {
-  const d = await openDB();
-  return new Promise((resolve, reject) => {
+function dbPut(store, data) {
+  return withDB(d => new Promise((resolve, reject) => {
     const tx = d.transaction(store, 'readwrite');
     tx.objectStore(store).put(data);
     tx.oncomplete = () => resolve();
     tx.onerror = e => reject(e.target.error);
-  });
+  }));
 }
 
-async function dbGet(store, key) {
-  const d = await openDB();
-  return new Promise((resolve, reject) => {
+function dbGet(store, key) {
+  return withDB(d => new Promise((resolve, reject) => {
     const req = d.transaction(store).objectStore(store).get(key);
     req.onsuccess = () => resolve(req.result);
     req.onerror = e => reject(e.target.error);
-  });
+  }));
 }
 
-async function dbGetAll(store) {
-  const d = await openDB();
-  return new Promise((resolve, reject) => {
+function dbGetAll(store) {
+  return withDB(d => new Promise((resolve, reject) => {
     const req = d.transaction(store).objectStore(store).getAll();
     req.onsuccess = () => resolve(req.result);
     req.onerror = e => reject(e.target.error);
-  });
+  }));
 }
 
-async function dbGetByIndex(store, indexName, value) {
-  const d = await openDB();
-  return new Promise((resolve, reject) => {
+function dbGetByIndex(store, indexName, value) {
+  return withDB(d => new Promise((resolve, reject) => {
     const req = d.transaction(store).objectStore(store).index(indexName).getAll(value);
     req.onsuccess = () => resolve(req.result);
     req.onerror = e => reject(e.target.error);
-  });
+  }));
 }
 
-async function dbDelete(store, key) {
-  const d = await openDB();
-  return new Promise((resolve, reject) => {
+function dbDelete(store, key) {
+  return withDB(d => new Promise((resolve, reject) => {
     const tx = d.transaction(store, 'readwrite');
     tx.objectStore(store).delete(key);
     tx.oncomplete = () => resolve();
     tx.onerror = e => reject(e.target.error);
-  });
+  }));
 }
 
 // Export all data as JSON (backup)
