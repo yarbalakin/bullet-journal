@@ -2841,3 +2841,113 @@ input, select, textarea { -webkit-tap-highlight-color: transparent; }
   transform: translateX(-50%);
   filter: drop-shadow(0 3px 4px rgba(160,120,100,0.15));
 }
+
+/* ── Lock Screen ── */
+.lock-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 24px;
+}
+
+.lock-card {
+  width: 100%;
+  max-width: 320px;
+  text-align: center;
+}
+
+.lock-logo {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.lock-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 4px;
+}
+
+.lock-sub {
+  font-size: 13px;
+  color: var(--text3);
+  margin: 0 0 28px;
+}
+
+.pin-dots {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.pin-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--pink);
+  background: transparent;
+  transition: background 0.15s;
+}
+
+.pin-dot.filled {
+  background: var(--pink);
+}
+
+.pin-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.pin-key {
+  aspect-ratio: 1;
+  border: none;
+  border-radius: 50%;
+  background: var(--card);
+  font-size: 22px;
+  font-family: inherit;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.12s;
+  box-shadow: 0 2px 8px rgba(160,120,100,0.08);
+}
+
+.pin-key:active { background: #e8d8d0; }
+.pin-back { font-size: 18px; }
+
+.lock-bio-btn {
+  width: 100%;
+  padding: 12px;
+  background: none;
+  border: 1.5px solid var(--pink);
+  border-radius: 14px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--pink);
+  cursor: pointer;
+  margin-bottom: 12px;
+  transition: background 0.15s;
+}
+
+.lock-bio-btn:active { background: #f8e8ec; }
+
+.lock-skip {
+  background: none;
+  border: none;
+  font-size: 13px;
+  color: var(--text3);
+  cursor: pointer;
+  padding: 6px;
+  font-family: inherit;
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin-top: 4px;
+}

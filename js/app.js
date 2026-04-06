@@ -31,6 +31,22 @@ async function init() {
     await initStickers();
   }
 
+  // Show lock screen if PIN is set and session not active
+  if (hasPin(user.id) && !isUnlocked(user.id)) {
+    showLockScreen(user.id, () => {
+      if (needsOnboarding(user.id)) {
+        document.querySelector('.tab-bar').style.display = 'none';
+        showOnboarding(user.id, () => {
+          document.querySelector('.tab-bar').style.display = '';
+          navigate('home');
+        });
+      } else {
+        navigate(location.hash.slice(1) || 'home');
+      }
+    });
+    return;
+  }
+
   // Show onboarding on first login, then navigate
   if (needsOnboarding(user.id)) {
     document.querySelector('.tab-bar').style.display = 'none';

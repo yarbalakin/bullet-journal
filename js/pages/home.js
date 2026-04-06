@@ -111,6 +111,7 @@ async function renderHome(container) {
           <button class="home-sync-btn secondary" onclick="restoreFromCloud()">&#8635; Восстановить</button>
           <button class="home-sync-btn secondary" onclick="exportData()">&#8675; JSON-бэкап</button>
           <button class="home-sync-btn secondary" onclick="updateApp()">&#8593; Обновить приложение</button>
+          <button class="home-sync-btn secondary" onclick="openLockSettings(getCurrentUser()?.id)">&#9679;&#9679;&#9679;&#9679; Защита</button>
         </div>
       </div>
     </div>
