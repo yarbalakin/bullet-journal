@@ -36,6 +36,34 @@ async function signInWithGoogle() {
   if (error) showToast('Ошибка входа: ' + error.message, true);
 }
 
+// Вход по email + пароль
+async function signInWithPassword(email, password) {
+  const { error } = await getSupabase().auth.signInWithPassword({ email, password });
+  if (error) {
+    showToast('Ошибка: ' + error.message, true);
+    return false;
+  }
+  location.reload();
+  return true;
+}
+
+// Регистрация по email + пароль
+async function signUpWithPassword(email, password) {
+  const { data, error } = await getSupabase().auth.signUp({ email, password });
+  if (error) {
+    showToast('Ошибка: ' + error.message, true);
+    return false;
+  }
+  // Если подтверждение email включено в Supabase — показываем подсказку
+  if (data.user && !data.session) {
+    document.getElementById('auth-hint').textContent = 'Проверь почту — нужно подтвердить регистрацию.';
+    document.getElementById('auth-hint').style.display = 'block';
+    return false;
+  }
+  location.reload();
+  return true;
+}
+
 // Вход через magic link на email
 async function signInWithEmail(email) {
   const { error } = await getSupabase().auth.signInWithOtp({
@@ -80,28 +108,89 @@ function showLoginScreen() {
 
         <div class="login-divider"><span>или</span></div>
 
-        <div class="login-email-form">
-          <input type="email" id="login-email" placeholder="твой@email.com" class="login-input">
-          <button class="btn-magic" onclick="handleMagicLink()">Получить ссылку</button>
+        <div id="login-form-password" class="login-email-form">
+          <input type="email" id="login-email" placeholder="твой@email.com" class="login-input" autocomplete="email">
+          <input type="password" id="login-password" placeholder="пароль" class="login-input" autocomplete="current-password">
+          <button class="btn-magic" id="btn-submit" onclick="handlePasswordAuth()">Войти</button>
+          <p class="login-toggle">
+            <span id="toggle-hint">Нет аккаунта?</span>
+            <a href="#" class="login-link" onclick="toggleAuthMode(event)">Зарегистрироваться</a>
+          </p>
+          <p class="login-toggle">
+            <a href="#" class="login-link" onclick="showMagicLinkForm(event)">Войти по ссылке на почту</a>
+          </p>
         </div>
 
-        <p class="login-hint" id="magic-hint" style="display:none">
-          Проверь почту — там ссылка для входа ✉️
-        </p>
+        <div id="login-form-magic" class="login-email-form" style="display:none">
+          <input type="email" id="magic-email" placeholder="твой@email.com" class="login-input" autocomplete="email">
+          <button class="btn-magic" id="btn-magic" onclick="handleMagicLink()">Получить ссылку</button>
+          <p class="login-toggle">
+            <a href="#" class="login-link" onclick="showPasswordForm(event)">Войти с паролем</a>
+          </p>
+        </div>
+
+        <p class="login-hint" id="auth-hint" style="display:none"></p>
       </div>
     </div>
   `;
 }
 
-async function handleMagicLink() {
+let _authMode = 'signin'; // 'signin' | 'signup'
+
+function toggleAuthMode(e) {
+  e.preventDefault();
+  _authMode = _authMode === 'signin' ? 'signup' : 'signin';
+  const isSignup = _authMode === 'signup';
+  document.getElementById('btn-submit').textContent = isSignup ? 'Создать аккаунт' : 'Войти';
+  document.getElementById('toggle-hint').textContent = isSignup ? 'Уже есть аккаунт?' : 'Нет аккаунта?';
+  document.querySelector('[onclick="toggleAuthMode(event)"]').textContent = isSignup ? 'Войти' : 'Зарегистрироваться';
+  document.getElementById('login-password').autocomplete = isSignup ? 'new-password' : 'current-password';
+  document.getElementById('auth-hint').style.display = 'none';
+}
+
+function showMagicLinkForm(e) {
+  e.preventDefault();
+  document.getElementById('login-form-password').style.display = 'none';
+  document.getElementById('login-form-magic').style.display = 'flex';
+  document.getElementById('auth-hint').style.display = 'none';
+}
+
+function showPasswordForm(e) {
+  e.preventDefault();
+  document.getElementById('login-form-magic').style.display = 'none';
+  document.getElementById('login-form-password').style.display = 'flex';
+  document.getElementById('auth-hint').style.display = 'none';
+}
+
+async function handlePasswordAuth() {
   const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  if (!email || !password) return;
+
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true;
+  btn.textContent = '...';
+
+  const ok = _authMode === 'signup'
+    ? await signUpWithPassword(email, password)
+    : await signInWithPassword(email, password);
+
+  if (!ok) {
+    btn.disabled = false;
+    btn.textContent = _authMode === 'signup' ? 'Создать аккаунт' : 'Войти';
+  }
+}
+
+async function handleMagicLink() {
+  const email = document.getElementById('magic-email').value.trim();
   if (!email) return;
-  const btn = document.querySelector('.btn-magic');
+  const btn = document.getElementById('btn-magic');
   btn.disabled = true;
   btn.textContent = 'Отправляем...';
   const ok = await signInWithEmail(email);
   if (ok) {
-    document.getElementById('magic-hint').style.display = 'block';
+    document.getElementById('auth-hint').textContent = 'Проверь почту — там ссылка для входа.';
+    document.getElementById('auth-hint').style.display = 'block';
     btn.textContent = 'Отправлено';
   } else {
     btn.disabled = false;

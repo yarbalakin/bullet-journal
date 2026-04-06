@@ -2640,6 +2640,23 @@ input, select, textarea { -webkit-tap-highlight-color: transparent; }
   color: var(--text3);
 }
 
+.login-toggle {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--text3);
+  text-align: center;
+}
+
+.login-link {
+  color: var(--pink);
+  text-decoration: none;
+  margin-left: 4px;
+}
+
+.login-link:hover {
+  text-decoration: underline;
+}
+
 /* ── Onboarding ── */
 .onboarding-overlay {
   position: fixed;
