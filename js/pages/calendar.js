@@ -185,11 +185,15 @@ async function renderCalendar(container, params = {}) {
           ${[1,2,3,4,5].map(level => {
             const todayStr = `${year}-${String(month+1).padStart(2,'0')}-${String(today).padStart(2,'0')}`;
             const isActive = monthMoods[todayStr]?.level === level;
+            const words = MOOD_LABELS[level].split(' ');
+            const labelHtml = words.length > 1
+              ? `${words.slice(0, -1).join(' ')}<br><span class="mood-btn-sub">${words[words.length - 1]}</span>`
+              : words[0];
             return `<button class="mood-btn ${isActive ? 'active' : ''}"
                             style="background:${MOOD_COLORS[level]}"
                             title="${MOOD_LABELS[level]}"
                             onclick="setMood('${todayStr}', ${level}, ${year}, ${month})">
-                      ${MOOD_LABELS[level]}
+                      ${labelHtml}
                     </button>`;
           }).join('')}
         </div>
