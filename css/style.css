@@ -335,19 +335,15 @@ h1, h2 {
 .mood-btn.active { border-color: var(--text); box-shadow: var(--shadow-lg); }
 
 .mood-legend {
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-  flex-wrap: nowrap;
+  display: none;
 }
 
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 3px;
-  font-size: 9px;
+  gap: 4px;
+  font-size: 10px;
   color: var(--text3);
-  white-space: nowrap;
 }
 
 .legend-dot {
