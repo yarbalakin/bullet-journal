@@ -25,7 +25,7 @@ async function renderHabits(container, params = {}) {
       const isDone = checked.includes(d);
       return `<button class="habit-cell ${isDone ? 'done' : ''}"
                       style="${isDone ? `background:${h.color}` : ''}"
-                      onclick="toggleHabitDay('${monthId}', ${hi}, ${d})"></button>`;
+                      onclick="toggleHabitDay('${monthId}', ${hi}, ${d}, this)"></button>`;
     }).join('');
     return `
       <div class="habit-row">
@@ -74,18 +74,25 @@ async function renderHabits(container, params = {}) {
   `;
 }
 
-async function toggleHabitDay(monthId, habitIdx, day) {
+async function toggleHabitDay(monthId, habitIdx, day, btn) {
   const log = await dbGet('habits', monthId) || { id: monthId, checks: {} };
   const key = String(habitIdx);
   const arr = log.checks[key] || [];
   const pos = arr.indexOf(day);
-  if (pos >= 0) arr.splice(pos, 1);
-  else arr.push(day);
+  if (pos >= 0) {
+    arr.splice(pos, 1);
+    if (btn) { btn.classList.remove('done'); btn.style.background = ''; }
+  } else {
+    arr.push(day);
+    if (btn) {
+      btn.classList.add('done');
+      const meta = await dbGet('habits', 'meta') || { id: 'meta', items: [] };
+      const color = meta.items[habitIdx]?.color || '';
+      btn.style.background = color;
+    }
+  }
   log.checks[key] = arr;
   await dbPut('habits', log);
-
-  const [yearStr, monthStr] = monthId.split('-');
-  navigate('habits', { year: parseInt(yearStr), month: parseInt(monthStr) - 1 });
 }
 
 async function addHabit(e) {
