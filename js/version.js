@@ -1,2 +1,2 @@
 // Версия приложения — обновлять вместе с CACHE_NAME в sw.js
-const APP_VERSION = '1.43';
+const APP_VERSION = '1.45';
