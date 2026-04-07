@@ -75,6 +75,9 @@ async function renderHabits(container, params = {}) {
 }
 
 async function toggleHabitDay(monthId, habitIdx, day, btn) {
+  const scrollEl = document.querySelector('.habits-scroll');
+  const savedScroll = scrollEl ? scrollEl.scrollLeft : 0;
+
   const log = await dbGet('habits', monthId) || { id: monthId, checks: {} };
   const key = String(habitIdx);
   const arr = log.checks[key] || [];
@@ -93,6 +96,8 @@ async function toggleHabitDay(monthId, habitIdx, day, btn) {
   }
   log.checks[key] = arr;
   await dbPut('habits', log);
+
+  if (scrollEl) requestAnimationFrame(() => { scrollEl.scrollLeft = savedScroll; });
 }
 
 async function addHabit(e) {
