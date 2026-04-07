@@ -1546,6 +1546,14 @@ h1, h2 {
   transition: all 0.15s;
 }
 
+.home-version {
+  text-align: center;
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 4px;
+  opacity: 0.6;
+}
+
 .home-sync-btn:active { background: var(--surface2); }
 .home-sync-btn.secondary { color: var(--text3); font-size: 12px; }
 
