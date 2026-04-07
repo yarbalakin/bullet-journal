@@ -297,12 +297,14 @@ h1, h2 {
 
 /* Mood picker */
 .mood-picker-section {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid var(--border2);
   border-radius: var(--radius);
   padding: 16px;
   margin-bottom: 16px;
-  box-shadow: var(--shadow);
+  box-shadow: 0 4px 24px rgba(60,30,20,0.18), 0 1px 6px rgba(60,30,20,0.10);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 
 .mood-picker-label {
