@@ -1659,6 +1659,10 @@ h1, h2 {
   margin-bottom: 20px;
 }
 
+.habits-scroll-inner {
+  width: max-content;
+}
+
 .habit-day-labels {
   display: flex;
   align-items: center;
