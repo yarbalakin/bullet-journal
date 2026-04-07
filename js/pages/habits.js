@@ -47,13 +47,15 @@ async function renderHabits(container, params = {}) {
         <h2>${MONTH_NAMES[month]} ${year}</h2>
         <button class="cal-nav-btn" onclick="navigate('habits', { year: ${nextYear}, month: ${nextMonth} })">&#8594;</button>
       </div>
-      <div class="habit-day-labels">
-        <div class="habit-name-col-empty"></div>
-        <div class="habit-cells">
-          ${dayHeaders.map(d => `<span class="habit-day-num">${d}</span>`).join('')}
+      <div class="habits-scroll">
+        <div class="habit-day-labels">
+          <div class="habit-name-col-empty"></div>
+          <div class="habit-cells">
+            ${dayHeaders.map(d => `<span class="habit-day-num">${d}</span>`).join('')}
+          </div>
         </div>
+        <div class="habits-list">${habitsHTML}</div>
       </div>
-      <div class="habits-list">${habitsHTML}</div>
       <form class="habit-add-form" onsubmit="addHabit(event)">
         <input class="habit-add-input" type="text" placeholder="Новая привычка..." required>
         <div class="habit-color-picker">

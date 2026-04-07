@@ -1653,11 +1653,16 @@ h1, h2 {
 
 .habits-header h2 { font-size: 22px; flex: 1; text-align: center; }
 
+.habits-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 20px;
+}
+
 .habit-day-labels {
   display: flex;
   align-items: center;
   margin-bottom: 4px;
-  overflow-x: auto;
 }
 
 .habit-name-col-empty {
@@ -1666,9 +1671,7 @@ h1, h2 {
 }
 
 .habits-list {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  margin-bottom: 20px;
+  margin-bottom: 0;
 }
 
 .habit-row {
