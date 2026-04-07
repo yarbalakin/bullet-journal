@@ -113,7 +113,7 @@ async function renderHome(container) {
           <button class="home-sync-btn secondary" onclick="updateApp()">&#8593; Обновить приложение</button>
           <button class="home-sync-btn secondary" onclick="openLockSettings(getCurrentUser()?.id)">&#9679;&#9679;&#9679;&#9679; Защита</button>
         </div>
-        <div class="home-version">v41</div>
+        <div class="home-version">1.42</div>
       </div>
     </div>
   `;
