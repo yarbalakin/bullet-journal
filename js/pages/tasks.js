@@ -146,7 +146,7 @@ async function renderTasks(container, params = {}) {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           </span>
         </label>
-        <button type="button" class="task-add-btn" onclick="showTypeChoice('${monthId}', ${year}, ${month})">+</button>
+        <button type="button" class="task-add-btn" onclick="handleAddBtn('${monthId}', ${year}, ${month})">+</button>
       </form>
 
       ${(pendingEvents.length) ? `
@@ -173,23 +173,6 @@ async function renderTasks(container, params = {}) {
       ${!tasks.length && !migrationTasks.length && !monthEvents.length ? '<div class="empty-state">Пока нет задач. Добавь первую!</div>' : ''}
     </div>
 
-    <!-- Модальное окно выбора типа -->
-    <div class="type-choice-overlay" id="type-choice-overlay" onclick="hideTypeChoice()">
-      <div class="type-choice-sheet" onclick="event.stopPropagation()">
-        <div class="type-choice-title">Что добавить?</div>
-        <div class="type-choice-buttons">
-          <button class="type-choice-btn" onclick="chooseTask()">
-            <span class="type-choice-icon">&#9633;</span>
-            Задача
-          </button>
-          <button class="type-choice-btn type-choice-btn-event" onclick="chooseEvent('${monthId}', ${year}, ${month})">
-            <span class="type-choice-icon">&#11044;</span>
-            Событие
-          </button>
-        </div>
-      </div>
-    </div>
-
     <!-- Модальное окно создания/редактирования события -->
     <div class="event-modal-overlay" id="event-modal-overlay" onclick="hideEventModal()">
       <div class="event-modal" onclick="event.stopPropagation()" id="event-modal-content">
@@ -199,47 +182,26 @@ async function renderTasks(container, params = {}) {
 }
 
 // ============================================================
-// Выбор типа: Задача / Событие
+// Логика кнопки "+": без даты → задача, с датой → событие
 // ============================================================
 
-function showTypeChoice(monthId, year, month) {
-  document.getElementById('type-choice-overlay').classList.add('active');
-  // Сохраняем параметры для события
-  window._taskMonthId = monthId;
-  window._taskYear = year;
-  window._taskMonth = month;
-}
-
-function hideTypeChoice() {
-  document.getElementById('type-choice-overlay').classList.remove('active');
-}
-
-function chooseTask() {
-  hideTypeChoice();
+function handleAddBtn(monthId, year, month) {
   const input = document.getElementById('task-input');
-  if (input) {
-    // Если текст уже введён — сабмитим форму
-    if (input.value.trim()) {
+  const dateInput = document.getElementById('task-date-input');
+  const title = input?.value?.trim();
+  const date = dateInput?.value;
+
+  if (date) {
+    // Есть дата → открываем форму события
+    showEventModal(null, date, year, month, title || '');
+  } else {
+    // Нет даты → сохраняем как задачу
+    if (title) {
       document.getElementById('task-form').requestSubmit();
     } else {
-      input.focus();
+      input?.focus();
     }
   }
-}
-
-function chooseEvent(monthId, year, month) {
-  hideTypeChoice();
-  // Дата по умолчанию: 1-е число текущего месяца или сегодня если тот же месяц
-  const now = new Date();
-  const nowMonth = now.getMonth();
-  const nowYear = now.getFullYear();
-  let defaultDate;
-  if (year === nowYear && month === nowMonth) {
-    defaultDate = now.toISOString().slice(0, 10);
-  } else {
-    defaultDate = `${year}-${String(month + 1).padStart(2, '0')}-01`;
-  }
-  showEventModal(null, defaultDate, year, month);
 }
 
 // ============================================================
@@ -248,7 +210,7 @@ function chooseEvent(monthId, year, month) {
 
 const TASKS_EVENT_COLORS = ['#b8a0d8','#e8a0b0','#a8c8a0','#f0c0a0','#f8e8c8','#a0b8d0'];
 
-function showEventModal(existingEvent, defaultDate, year, month) {
+function showEventModal(existingEvent, defaultDate, year, month, defaultTitle = '') {
   const isEdit = existingEvent !== null;
   const ev = existingEvent || {};
 
@@ -264,7 +226,7 @@ function showEventModal(existingEvent, defaultDate, year, month) {
   const timeVal = isEdit && ev.time ? ev.time : '';
   const placeVal = isEdit && ev.place ? ev.place : '';
   const descVal = isEdit && ev.description ? ev.description : '';
-  const titleVal = isEdit ? ev.title : '';
+  const titleVal = isEdit ? ev.title : defaultTitle;
 
   const onsubmit = isEdit
     ? `updateEventFromTasks(event, ${ev.id}, ${year}, ${month})`
@@ -364,6 +326,11 @@ async function saveEventFromTasks(e, year, month) {
     createdAt: new Date().toISOString(),
   });
   hideEventModal();
+  // Очищаем поля формы
+  const taskInput = document.getElementById('task-input');
+  const dateInput = document.getElementById('task-date-input');
+  if (taskInput) taskInput.value = '';
+  if (dateInput) { dateInput.value = ''; onTaskDateChange(dateInput); }
   navigate('tasks', { year, month });
 }
 
