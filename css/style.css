@@ -2502,7 +2502,10 @@ input, select, textarea { -webkit-tap-highlight-color: transparent; }
   font-family: 'Cormorant Garamond', serif;
   font-size: 26px;
   font-weight: 600;
+  flex: 1;
 }
+
+.diary-add-entry-btn { margin-left: auto; }
 
 .diary-entries { display: flex; flex-direction: column; gap: 12px; }
 

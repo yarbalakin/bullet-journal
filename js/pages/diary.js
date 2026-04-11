@@ -26,11 +26,15 @@ async function renderDiary(container) {
       `).join('')
     : '<div class="diary-empty">Пока нет ни одной заметки дня</div>';
 
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
   container.innerHTML = `
     <div class="page-diary">
       <div class="diary-page-header">
         <button class="back-btn" onclick="navigate('home')">&larr;</button>
         <h2>Заметки дня</h2>
+        <button class="day-add-btn diary-add-entry-btn" onclick="navigate('day', { date: '${todayStr}' })" title="Добавить запись">+</button>
       </div>
       <div class="diary-entries">
         ${entriesHTML}
