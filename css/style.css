@@ -1839,10 +1839,71 @@ h1, h2 {
 
 .habit-add-btn:active { background: var(--pink-dark); }
 
-/* ── DAY NOTES ── */
+/* ── DAY NOTES (multi-entry) ── */
+.day-notes-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; }
+
+.day-note-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+}
+
+.day-note-text {
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.day-note-meta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.day-note-time { font-size: 11px; color: var(--text3); }
+
+.day-note-delete {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: var(--text3);
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+}
+
+.day-note-delete:hover { color: var(--pink-dark); }
+
+.day-note-add-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.day-note-add-btn {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--pink);
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.day-note-add-btn:active { background: var(--pink-dark); }
+
 .day-notes-textarea {
   width: 100%;
-  min-height: 100px;
+  min-height: 60px;
   border: 1px solid var(--border2);
   border-radius: var(--radius-sm);
   padding: 10px 12px;
@@ -2521,13 +2582,24 @@ input, select, textarea { -webkit-tap-highlight-color: transparent; }
 
 .diary-entry:active { transform: scale(0.98); background: var(--surface2); }
 
+.diary-entry-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
 .diary-entry-date {
   font-size: 12px;
   font-weight: 600;
   color: var(--pink-dark);
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  margin-bottom: 6px;
+}
+
+.diary-entry-time {
+  font-size: 11px;
+  color: var(--text3);
 }
 
 .diary-entry-text {

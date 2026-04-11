@@ -17,6 +17,15 @@ async function renderDay(container, params = {}) {
   const allTasks = await dbGetByIndex('tasks', 'monthId', monthId);
   const pendingTasks = allTasks.filter(t => t.status !== 'done');
   const dayNote = await dbGet('daynotes', dateStr);
+  // Migrate old text field to notes array
+  const dayNotes = (() => {
+    if (!dayNote) return [];
+    if (Array.isArray(dayNote.notes)) return dayNote.notes;
+    if (dayNote.text && dayNote.text.trim()) {
+      return [{ id: 'legacy', text: dayNote.text, createdAt: dateStr + 'T00:00:00.000Z' }];
+    }
+    return [];
+  })();
 
   // Mood section
   const moodHTML = `
@@ -74,11 +83,30 @@ async function renderDay(container, params = {}) {
     </div>
   `;
 
+  const notesListHTML = dayNotes.length
+    ? dayNotes.map(n => {
+        const time = n.createdAt ? new Date(n.createdAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }) : '';
+        return `
+          <div class="day-note-item" data-id="${n.id}">
+            <div class="day-note-text">${n.text.replace(/\n/g, '<br>')}</div>
+            <div class="day-note-meta">
+              ${time ? `<span class="day-note-time">${time}</span>` : ''}
+              <button class="day-note-delete" onclick="deleteDayNote('${dateStr}', '${n.id}')">&times;</button>
+            </div>
+          </div>`;
+      }).join('')
+    : '';
+
   const notesHTML = `
     <div class="day-section" id="day-notes-section">
-      <div class="day-section-title">Заметки дня</div>
-      <textarea class="day-notes-textarea" placeholder="Как прошёл день..."
-                onblur="saveDayNote('${dateStr}', this.value)">${dayNote?.text || ''}</textarea>
+      <div class="day-section-header">
+        <div class="day-section-title">Заметки дня</div>
+      </div>
+      <div class="day-notes-list">${notesListHTML}</div>
+      <div class="day-note-add-row">
+        <textarea class="day-notes-textarea" id="day-note-input" placeholder="Записать мысль..." rows="2"></textarea>
+        <button class="day-note-add-btn" onclick="addDayNote('${dateStr}')">+</button>
+      </div>
     </div>
   `;
 
@@ -164,13 +192,24 @@ async function renderDay(container, params = {}) {
   // Auto-resize textareas that have content
   setTimeout(initDiaryTextareas, 0);
 
+  // Wire up Ctrl+Enter / Cmd+Enter to submit note
+  const noteInput = document.getElementById('day-note-input');
+  if (noteInput) {
+    noteInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        addDayNote(dateStr);
+      }
+    });
+  }
+
   // Scroll to notes section and focus textarea if requested
   if (params.scrollTo === 'notes') {
     setTimeout(() => {
       const section = document.getElementById('day-notes-section');
       if (section) {
         section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        section.querySelector('.day-notes-textarea')?.focus();
+        document.getElementById('day-note-input')?.focus();
       }
     }, 150);
   }
@@ -181,15 +220,33 @@ function escDiary(v) {
   return v.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
 }
 
-async function saveDayNote(dateStr, text) {
+async function addDayNote(dateStr) {
+  const input = document.getElementById('day-note-input');
+  const text = input?.value?.trim();
+  if (!text) return;
   const existing = await dbGet('daynotes', dateStr) || { date: dateStr };
-  existing.text = text.trim() || undefined;
-  // Keep record if diary has data, otherwise clean up
-  if (existing.text || existing.diary) {
-    await dbPut('daynotes', existing);
-  } else {
-    await dbDelete('daynotes', dateStr);
+  // Migrate old text field
+  if (!Array.isArray(existing.notes)) {
+    existing.notes = existing.text?.trim()
+      ? [{ id: 'legacy', text: existing.text, createdAt: dateStr + 'T00:00:00.000Z' }]
+      : [];
+    delete existing.text;
   }
+  existing.notes.unshift({ id: Date.now().toString(), text, createdAt: new Date().toISOString() });
+  await dbPut('daynotes', existing);
+  navigate('day', { date: dateStr, scrollTo: 'notes' });
+}
+
+async function deleteDayNote(dateStr, noteId) {
+  const existing = await dbGet('daynotes', dateStr);
+  if (!existing) return;
+  existing.notes = (existing.notes || []).filter(n => n.id !== noteId);
+  if (existing.notes.length === 0 && !existing.diary) {
+    await dbDelete('daynotes', dateStr);
+  } else {
+    await dbPut('daynotes', existing);
+  }
+  navigate('day', { date: dateStr, scrollTo: 'notes' });
 }
 
 async function saveDiaryField(dateStr, field, index, value) {
