@@ -75,7 +75,7 @@ async function renderDay(container, params = {}) {
   `;
 
   const notesHTML = `
-    <div class="day-section">
+    <div class="day-section" id="day-notes-section">
       <div class="day-section-title">Заметки дня</div>
       <textarea class="day-notes-textarea" placeholder="Как прошёл день..."
                 onblur="saveDayNote('${dateStr}', this.value)">${dayNote?.text || ''}</textarea>
@@ -163,6 +163,17 @@ async function renderDay(container, params = {}) {
 
   // Auto-resize textareas that have content
   setTimeout(initDiaryTextareas, 0);
+
+  // Scroll to notes section and focus textarea if requested
+  if (params.scrollTo === 'notes') {
+    setTimeout(() => {
+      const section = document.getElementById('day-notes-section');
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        section.querySelector('.day-notes-textarea')?.focus();
+      }
+    }, 150);
+  }
 }
 
 function escDiary(v) {

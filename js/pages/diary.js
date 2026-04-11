@@ -19,7 +19,7 @@ async function renderDiary(container) {
 
   const entriesHTML = entries.length
     ? entries.map(n => `
-        <div class="diary-entry" onclick="navigate('day', { date: '${n.date}' })">
+        <div class="diary-entry" onclick="navigate('day', { date: '${n.date}', scrollTo: 'notes' })">
           <div class="diary-entry-date">${formatDate(n.date)}</div>
           <div class="diary-entry-text">${n.text.replace(/\n/g, '<br>')}</div>
         </div>
@@ -34,7 +34,7 @@ async function renderDiary(container) {
       <div class="diary-page-header">
         <button class="back-btn" onclick="navigate('home')">&larr;</button>
         <h2>Заметки дня</h2>
-        <button class="day-add-btn diary-add-entry-btn" onclick="navigate('day', { date: '${todayStr}' })" title="Добавить запись">+</button>
+        <button class="day-add-btn diary-add-entry-btn" onclick="navigate('day', { date: '${todayStr}', scrollTo: 'notes' })" title="Добавить запись">+</button>
       </div>
       <div class="diary-entries">
         ${entriesHTML}
