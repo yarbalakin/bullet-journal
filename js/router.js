@@ -1,6 +1,7 @@
 // Simple SPA router
 const routes = {};
 let currentPage = null;
+const scrollPositions = {};
 
 function route(path, handler) {
   routes[path] = handler;
@@ -9,6 +10,11 @@ function route(path, handler) {
 function navigate(path, params = {}) {
   const content = document.getElementById('content');
   if (!content) return;
+
+  // Save scroll position of current page before leaving
+  if (currentPage) {
+    scrollPositions[currentPage] = window.scrollY;
+  }
 
   // Update active tab
   document.querySelectorAll('.tab').forEach(t => {
@@ -21,17 +27,29 @@ function navigate(path, params = {}) {
     currentPage = path;
     content.innerHTML = '';
     const result = handler(content, params);
-    if (result && typeof result.catch === 'function') {
-      result.catch(e => {
+    const finish = () => {
+      // Restore scroll: use saved position only if no explicit params (i.e. returning, not fresh nav)
+      const saved = scrollPositions[path];
+      const isFreshNav = Object.keys(params).length > 0;
+      if (saved !== undefined && !isFreshNav) {
+        requestAnimationFrame(() => window.scrollTo(0, saved));
+      } else {
+        window.scrollTo(0, 0);
+      }
+      // Render stickers overlay after page content
+      if (typeof renderPageStickers === 'function') {
+        setTimeout(renderPageStickers, 50);
+      }
+    };
+    if (result && typeof result.then === 'function') {
+      result.then(finish).catch(e => {
         console.error('Page render error:', path, e);
         content.innerHTML = `<p style="padding:20px;color:#c05050;font-size:14px">Ошибка: ${e.message}</p>`;
       });
+    } else {
+      finish();
     }
     history.pushState({ path, params }, '', `#${path}`);
-    // Render stickers overlay after page content
-    if (typeof renderPageStickers === 'function') {
-      setTimeout(renderPageStickers, 50);
-    }
   }
 }
 
