@@ -146,7 +146,7 @@ async function renderTasks(container, params = {}) {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
           </span>
         </label>
-        <button type="button" class="task-add-btn" onclick="showTypeChoice('${monthId}', ${year}, ${month})">+</button>
+        <button type="button" class="task-add-btn" onclick="handleAddBtn('${monthId}', ${year}, ${month})">+</button>
       </form>
 
       ${(pendingEvents.length) ? `
@@ -202,6 +202,24 @@ async function renderTasks(container, params = {}) {
 // Выбор типа: Задача / Событие
 // ============================================================
 
+function handleAddBtn(monthId, year, month) {
+  const input = document.getElementById('task-input');
+  const dateInput = document.getElementById('task-date-input');
+  const title = input?.value?.trim();
+  const date = dateInput?.value;
+
+  if (!title) {
+    // Пустой input → показать диалог выбора
+    showTypeChoice(monthId, year, month);
+  } else if (date) {
+    // Есть текст + дата → сразу открыть форму события
+    showEventModal(null, date, year, month, title);
+  } else {
+    // Есть текст, нет даты → сохранить как задачу
+    document.getElementById('task-form').requestSubmit();
+  }
+}
+
 function showTypeChoice(monthId, year, month) {
   document.getElementById('type-choice-overlay').classList.add('active');
   // Сохраняем параметры для события
@@ -248,7 +266,7 @@ function chooseEvent(monthId, year, month) {
 
 const TASKS_EVENT_COLORS = ['#b8a0d8','#e8a0b0','#a8c8a0','#f0c0a0','#f8e8c8','#a0b8d0'];
 
-function showEventModal(existingEvent, defaultDate, year, month) {
+function showEventModal(existingEvent, defaultDate, year, month, defaultTitle = '') {
   const isEdit = existingEvent !== null;
   const ev = existingEvent || {};
 
@@ -264,7 +282,7 @@ function showEventModal(existingEvent, defaultDate, year, month) {
   const timeVal = isEdit && ev.time ? ev.time : '';
   const placeVal = isEdit && ev.place ? ev.place : '';
   const descVal = isEdit && ev.description ? ev.description : '';
-  const titleVal = isEdit ? ev.title : '';
+  const titleVal = isEdit ? ev.title : defaultTitle;
 
   const onsubmit = isEdit
     ? `updateEventFromTasks(event, ${ev.id}, ${year}, ${month})`
