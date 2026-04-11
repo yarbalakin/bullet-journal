@@ -72,14 +72,15 @@ async function renderLifewheel(container, params = {}) {
     // Bar visualization (only if scored)
     const barHTML = val > 0 ? `<div class="lw-bar-track"><div class="lw-bar-fill" style="width:${val * 10}%;background:${lwScoreColor(val)}"></div></div>` : '';
 
+
     return `
-      <div class="lw-row">
+      <div class="lw-row" data-area="${area.replace(/"/g, '&quot;')}">
         <div class="lw-row-header">
           <span class="lw-area-name">${area}</span>
           ${deltaHTML}
         </div>
         <div class="lw-buttons">${btns.join('')}</div>
-        ${barHTML}
+        ${barHTML ? `<div class="lw-bar-wrap">${barHTML}</div>` : '<div class="lw-bar-wrap"></div>'}
       </div>
     `;
   }).join('');
@@ -133,7 +134,63 @@ async function lwSetScore(monthId, area, value, year, month) {
     data.completedAt = new Date().toISOString();
   }
   await dbPut('lifewheel', data);
-  navigate('lifewheel', { year, month });
+
+  // Update only the changed row — no full re-render, no scroll jump
+  const val = data.scores[area] || 0;
+  const prev = await dbGet('lifewheel', lwPrevMonthId(monthId));
+  const prevVal = prev?.scores?.[area];
+
+  const row = document.querySelector(`.lw-row[data-area="${area.replace(/"/g, '&quot;')}"]`);
+  if (row) {
+    // Update buttons
+    const btnsHTML = [];
+    for (let i = 1; i <= 10; i++) {
+      const active = val === i;
+      const color = active ? lwScoreColor(i) : '';
+      btnsHTML.push(`<button class="lw-btn ${active ? 'active' : ''}" style="${active ? 'background:' + color + ';color:#fff;border-color:' + color : ''}" onclick="lwSetScore('${monthId}', '${area.replace(/'/g, "\\'")}', ${i}, ${year}, ${month})">${i}</button>`);
+    }
+    row.querySelector('.lw-buttons').innerHTML = btnsHTML.join('');
+
+    // Update bar
+    const barWrap = row.querySelector('.lw-bar-wrap');
+    if (barWrap) {
+      barWrap.innerHTML = val > 0 ? `<div class="lw-bar-track"><div class="lw-bar-fill" style="width:${val * 10}%;background:${lwScoreColor(val)}"></div></div>` : '';
+    }
+
+    // Update delta
+    let deltaHTML = '';
+    if (prevVal !== undefined && val > 0) {
+      const diff = val - prevVal;
+      if (diff > 0) deltaHTML = `<span class="lw-delta lw-up">+${diff}</span>`;
+      else if (diff < 0) deltaHTML = `<span class="lw-delta lw-down">${diff}</span>`;
+      else deltaHTML = `<span class="lw-delta lw-same">=</span>`;
+    }
+    const existingDelta = row.querySelector('.lw-delta');
+    if (existingDelta) existingDelta.remove();
+    if (deltaHTML) row.querySelector('.lw-row-header').insertAdjacentHTML('beforeend', deltaHTML);
+  }
+
+  // Update summary
+  const allScored = LIFE_AREAS.filter(a => data.scores[a] > 0);
+  const summaryEl = document.querySelector('.lw-summary');
+  if (summaryEl) {
+    if (allScored.length === LIFE_AREAS.length) {
+      const total = allScored.reduce((s, a) => s + data.scores[a], 0);
+      const avg = (total / allScored.length).toFixed(1);
+      summaryEl.innerHTML = `<span>Заполнено: ${allScored.length}/${LIFE_AREAS.length}</span><button class="lw-dynamics-btn" onclick="navigate('lifewheel', { year: ${year}, month: ${month}, view: 'dynamics' })">Динамика</button>`;
+    } else {
+      summaryEl.innerHTML = `<span>Заполнено: ${allScored.length}/${LIFE_AREAS.length}</span>`;
+    }
+  } else if (allScored.length > 0) {
+    // Insert summary if it didn't exist before
+    const list = document.querySelector('.lw-list');
+    if (list) {
+      const div = document.createElement('div');
+      div.className = 'lw-summary';
+      div.innerHTML = `<span>Заполнено: ${allScored.length}/${LIFE_AREAS.length}</span>`;
+      list.before(div);
+    }
+  }
 }
 
 // ── Dynamics view ──
