@@ -232,9 +232,27 @@ async function addDayNote(dateStr) {
       : [];
     delete existing.text;
   }
-  existing.notes.unshift({ id: Date.now().toString(), text, createdAt: new Date().toISOString() });
+  const noteId = Date.now().toString();
+  const createdAt = new Date().toISOString();
+  existing.notes.unshift({ id: noteId, text, createdAt });
   await dbPut('daynotes', existing);
-  navigate('day', { date: dateStr, scrollTo: 'notes' });
+
+  // Update DOM without re-rendering the page
+  if (input) input.value = '';
+  const list = document.querySelector('.day-notes-list');
+  if (list) {
+    const time = new Date(createdAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+    const el = document.createElement('div');
+    el.className = 'day-note-item';
+    el.dataset.id = noteId;
+    el.innerHTML = `
+      <div class="day-note-text">${text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/\n/g,'<br>')}</div>
+      <div class="day-note-meta">
+        <span class="day-note-time">${time}</span>
+        <button class="day-note-delete" onclick="deleteDayNote('${dateStr}', '${noteId}')">&times;</button>
+      </div>`;
+    list.prepend(el);
+  }
 }
 
 async function deleteDayNote(dateStr, noteId) {
@@ -246,7 +264,7 @@ async function deleteDayNote(dateStr, noteId) {
   } else {
     await dbPut('daynotes', existing);
   }
-  navigate('day', { date: dateStr, scrollTo: 'notes' });
+  document.querySelector(`.day-note-item[data-id="${noteId}"]`)?.remove();
 }
 
 async function saveDiaryField(dateStr, field, index, value) {
@@ -301,10 +319,6 @@ async function saveDiaryListField(dateStr, field, index, value, skipNavigate = f
   }
 
   await dbPut('daynotes', existing);
-
-  if (value.trim() !== '' && !skipNavigate) {
-    navigate('day', { date: dateStr });
-  }
 }
 
 function diaryListKeydown(e, dateStr, field, index) {
