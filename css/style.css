@@ -735,11 +735,14 @@ h1, h2 {
 .event-modal {
   width: 100%;
   max-width: 480px;
-  max-height: 92vh;
-  overflow-y: auto;
+  /* На iOS клавиатура сдвигает viewport — оставляем запас */
+  max-height: 80vh;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   background: var(--bg);
   border-radius: var(--radius) var(--radius) 0 0;
-  padding: 0 0 calc(16px + env(safe-area-inset-bottom, 0px));
+  padding: 0 0 calc(env(safe-area-inset-bottom, 16px) + 16px);
 }
 
 .event-modal-header {
@@ -959,9 +962,18 @@ h1, h2 {
   outline: none;
   transition: border-color 0.2s;
   width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  box-shadow: none;
+  -webkit-box-shadow: none;
+  resize: none;
 }
 
 .form-input:focus { border-color: var(--pink); }
+
+/* Убираем красную iOS-валидацию */
+.form-input:required { box-shadow: none; -webkit-box-shadow: none; }
+.form-input:invalid { box-shadow: none; -webkit-box-shadow: none; }
 
 .form-expire-preview {
   font-size: 13px;
