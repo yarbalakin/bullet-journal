@@ -952,6 +952,9 @@ h1, h2 {
 }
 
 .form-input {
+  display: block;
+  width: 100%;
+  min-width: 0;
   padding: 12px 14px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -961,12 +964,12 @@ h1, h2 {
   color: var(--text);
   outline: none;
   transition: border-color 0.2s;
-  width: 100%;
   -webkit-appearance: none;
   appearance: none;
   box-shadow: none;
   -webkit-box-shadow: none;
   resize: none;
+  box-sizing: border-box;
 }
 
 .form-input:focus { border-color: var(--pink); }
