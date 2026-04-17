@@ -45,7 +45,7 @@ async function renderPixels(container) {
     <div class="page-pixels">
       <div class="day-header">
         <button class="back-btn" onclick="navigate('home')">&larr;</button>
-        <h2>Year in Pixels ${year}</h2>
+        <h2>Год в пикселях ${year}</h2>
       </div>
 
       <div class="pixels-stats">

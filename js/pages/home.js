@@ -91,7 +91,7 @@ async function renderHome(container) {
           </div>
           <div class="home-nav-item" onclick="navigate('pixels')">
             <span class="home-nav-icon">&#9632;</span>
-            <span>Пиксели</span>
+            <span>Год в пикселях</span>
           </div>
           <div class="home-nav-item" onclick="navigate('future')">
             <span class="home-nav-icon">&#8594;</span>
