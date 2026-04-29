@@ -216,7 +216,14 @@ function handleAddBtn(monthId, year, month) {
     showEventModal(null, date, year, month, title);
   } else {
     // Есть текст, нет даты → сохранить как задачу
-    document.getElementById('task-form').requestSubmit();
+    // requestSubmit() не поддерживается на iOS < 16, сохраняем напрямую
+    dbPut('tasks', {
+      monthId,
+      title,
+      date: null,
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+    }).then(() => navigate('tasks', { year, month }));
   }
 }
 
@@ -236,9 +243,16 @@ function chooseTask() {
   hideTypeChoice();
   const input = document.getElementById('task-input');
   if (input) {
-    // Если текст уже введён — сабмитим форму
-    if (input.value.trim()) {
-      document.getElementById('task-form').requestSubmit();
+    const title = input.value.trim();
+    if (title) {
+      // requestSubmit() не поддерживается на iOS < 16, сохраняем напрямую
+      dbPut('tasks', {
+        monthId: window._taskMonthId,
+        title,
+        date: null,
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+      }).then(() => navigate('tasks', { year: window._taskYear, month: window._taskMonth }));
     } else {
       input.focus();
     }
