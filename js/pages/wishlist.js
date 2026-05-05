@@ -9,6 +9,7 @@ const WISH_CATEGORIES = [
 ];
 
 let wishlistFilter = 'want';
+let wishPendingImage = null; // base64 выбранного фото до сохранения
 
 async function renderWishlist(container) {
   const entry = await dbGet('collections', 'wishlist') || { id: 'wishlist', items: [] };
@@ -26,6 +27,10 @@ async function renderWishlist(container) {
 
   const wantCount   = items.filter(i => !i.done).length;
   const boughtCount = items.filter(i =>  i.done).length;
+
+  const renderThumb = (item, idx) => item.image
+    ? `<img class="wish-thumb" src="${item.image}" alt="" onclick="openWishLightbox(${idx})">`
+    : `<span class="wish-cat-icon">${getCatIcon(item.category)}</span>`;
 
   container.innerHTML = `
     <div class="page-wishlist">
@@ -56,13 +61,18 @@ async function renderWishlist(container) {
           return `
             <div class="wish-card ${item.done ? 'done' : ''}">
               <div class="wish-card-left">
-                <span class="wish-cat-icon">${getCatIcon(item.category)}</span>
+                ${renderThumb(item, realIdx)}
                 <div class="wish-card-info">
                   <span class="wish-card-name">${item.text}</span>
                   ${item.price ? `<span class="wish-card-price">${fmt(item.price)}</span>` : ''}
                 </div>
               </div>
               <div class="wish-card-actions">
+                <label class="wish-photo-btn" title="Фото">
+                  &#128247;
+                  <input type="file" accept="image/*" style="display:none"
+                         onchange="attachWishPhoto(event, ${realIdx})">
+                </label>
                 ${item.url ? `<a class="wish-link-btn" href="${item.url}" target="_blank" rel="noopener">&#128279;</a>` : ''}
                 <button class="wish-check-btn ${item.done ? 'checked' : ''}" onclick="toggleWishItem(${realIdx})">
                   ${item.done ? '&#10003;' : ''}
@@ -75,6 +85,7 @@ async function renderWishlist(container) {
       </div>
     </div>
 
+    <!-- Модалка добавления -->
     <div class="wish-modal-overlay" id="wishModal" style="display:none" onclick="closeWishModal(event)">
       <div class="wish-modal">
         <h3 class="wish-modal-title">Добавить желание</h3>
@@ -97,6 +108,16 @@ async function renderWishlist(container) {
               ${WISH_CATEGORIES.map(c => `<option value="${c.id}">${c.icon} ${c.label}</option>`).join('')}
             </select>
           </div>
+          <div class="wish-field">
+            <label class="wish-label">Фото</label>
+            <label class="wish-photo-pick">
+              <div id="wishImgPreview" class="wish-img-preview">
+                <span>&#128247; Выбрать фото</span>
+              </div>
+              <input type="file" accept="image/*" id="wishImgInput" style="display:none"
+                     onchange="previewWishImage(event)">
+            </label>
+          </div>
           <div class="wish-modal-btns">
             <button type="button" class="wish-modal-cancel" onclick="closeWishModal()">Отмена</button>
             <button type="submit" class="wish-modal-submit">Добавить</button>
@@ -104,10 +125,78 @@ async function renderWishlist(container) {
         </form>
       </div>
     </div>
+
+    <!-- Лайтбокс -->
+    <div class="wish-lightbox" id="wishLightbox" style="display:none" onclick="closeWishLightbox()">
+      <img id="wishLightboxImg" src="" alt="">
+    </div>
   `;
 }
 
+// Ресайз фото через canvas до maxSize px по длинной стороне
+function resizeWishImage(file, maxSize = 800) {
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        if (w > maxSize || h > maxSize) {
+          if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+          else       { w = Math.round(w * maxSize / h); h = maxSize; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.82));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function previewWishImage(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  resizeWishImage(file).then(b64 => {
+    wishPendingImage = b64;
+    const preview = document.getElementById('wishImgPreview');
+    if (preview) {
+      preview.innerHTML = `<img src="${b64}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">`;
+    }
+  });
+}
+
+async function attachWishPhoto(e, index) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const b64 = await resizeWishImage(file);
+  const entry = await dbGet('collections', 'wishlist');
+  if (!entry) return;
+  entry.items[index].image = b64;
+  await dbPut('collections', entry);
+  navigate('wishlist');
+}
+
+function openWishLightbox(index) {
+  dbGet('collections', 'wishlist').then(entry => {
+    if (!entry?.items?.[index]?.image) return;
+    const lb = document.getElementById('wishLightbox');
+    const img = document.getElementById('wishLightboxImg');
+    if (!lb || !img) return;
+    img.src = entry.items[index].image;
+    lb.style.display = 'flex';
+  });
+}
+
+function closeWishLightbox() {
+  const lb = document.getElementById('wishLightbox');
+  if (lb) lb.style.display = 'none';
+}
+
 function openWishModal() {
+  wishPendingImage = null;
   const modal = document.getElementById('wishModal');
   modal.style.display = 'flex';
   setTimeout(() => document.getElementById('wishText')?.focus(), 50);
@@ -115,6 +204,7 @@ function openWishModal() {
 
 function closeWishModal(e) {
   if (!e || e.target.id === 'wishModal') {
+    wishPendingImage = null;
     document.getElementById('wishModal').style.display = 'none';
   }
 }
@@ -136,8 +226,10 @@ async function addWishItem(e) {
   const item = { text, category, done: false, addedAt: new Date().toISOString().slice(0, 10) };
   if (priceVal > 0) item.price = priceVal;
   if (url) item.url = url;
+  if (wishPendingImage) item.image = wishPendingImage;
   entry.items.push(item);
   await dbPut('collections', entry);
+  wishPendingImage = null;
   navigate('wishlist');
 }
 
