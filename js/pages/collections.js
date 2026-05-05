@@ -1,7 +1,6 @@
 // Collections — curated lists
 const COLLECTIONS_META = [
   { id: 'books',     label: 'Книги',          icon: '&#128218;', doneLabel: 'прочитано' },
-  { id: 'wishlist',  label: 'Вишлист',         icon: '&#10024;',  doneLabel: 'куплено' },
   { id: 'gifts',     label: 'Идеи подарков',   icon: '&#127873;', doneLabel: 'подарено' },
   { id: 'braindump', label: 'Мысли',           icon: '&#9997;',   doneLabel: '' },
 ];

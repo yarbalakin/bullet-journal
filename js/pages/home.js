@@ -97,6 +97,10 @@ async function renderHome(container) {
             <span class="home-nav-icon">&#8594;</span>
             <span>Future Log</span>
           </div>
+          <div class="home-nav-item" onclick="navigate('wishlist')">
+            <span class="home-nav-icon">&#10024;</span>
+            <span>Вишлист</span>
+          </div>
           <div class="home-nav-item" onclick="navigate('collections')">
             <span class="home-nav-icon">&#9733;</span>
             <span>Коллекции</span>

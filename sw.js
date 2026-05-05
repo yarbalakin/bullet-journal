@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bujo-v65';
+const CACHE_NAME = 'bujo-v66';
 const ASSETS = [
   './',
   './index.html',
@@ -20,6 +20,7 @@ const ASSETS = [
   './js/pages/pixels.js',
   './js/pages/future.js',
   './js/pages/collections.js',
+  './js/pages/wishlist.js',
   './js/pages/habits.js',
   './js/pages/coverPicker.js',
   './js/pages/lifewheel.js',

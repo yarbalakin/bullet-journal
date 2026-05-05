@@ -3112,3 +3112,270 @@ input, select, textarea { -webkit-tap-highlight-color: transparent; }
   text-align: center;
   margin-top: 4px;
 }
+
+/* ── WISHLIST ── */
+.page-wishlist { padding-bottom: 40px; }
+
+.wish-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.wish-header h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  flex: 1;
+}
+
+.wish-add-fab {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--pink);
+  color: #fff;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.wish-filter {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.wish-filter-btn {
+  flex: 1;
+  padding: 7px 4px;
+  border: 1.5px solid var(--border2);
+  border-radius: var(--radius-sm);
+  background: var(--surface2);
+  color: var(--text2);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.wish-filter-btn.active {
+  background: var(--pink-light);
+  border-color: var(--pink);
+  color: var(--pink-dark);
+  font-weight: 600;
+}
+
+.wish-totals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.wish-total-item {
+  font-size: 13px;
+  color: var(--text2);
+  background: var(--surface3);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+}
+
+.wish-total-item.bought {
+  background: var(--sage-light);
+  color: var(--sage);
+}
+
+.wish-total-item b { color: var(--text); }
+
+.wish-list { display: flex; flex-direction: column; gap: 10px; }
+
+.wish-empty {
+  text-align: center;
+  color: var(--text3);
+  font-style: italic;
+  font-size: 14px;
+  padding: 32px 0;
+}
+
+.wish-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: var(--shadow);
+  transition: opacity 0.2s;
+}
+
+.wish-card.done { opacity: 0.55; }
+
+.wish-card.done .wish-card-name {
+  text-decoration: line-through;
+  color: var(--text3);
+}
+
+.wish-card-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.wish-cat-icon { font-size: 22px; flex-shrink: 0; }
+
+.wish-card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.wish-card-name {
+  font-size: 15px;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wish-card-price {
+  font-size: 13px;
+  color: var(--text2);
+}
+
+.wish-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.wish-link-btn {
+  color: var(--lavender);
+  font-size: 16px;
+  text-decoration: none;
+  padding: 2px;
+}
+
+.wish-check-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border2);
+  background: var(--surface2);
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--sage);
+  transition: all 0.15s;
+}
+
+.wish-check-btn.checked {
+  background: var(--sage-light);
+  border-color: var(--sage);
+}
+
+.wish-delete-btn {
+  background: none;
+  border: none;
+  color: var(--text3);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 2px;
+  opacity: 0.5;
+}
+
+.wish-delete-btn:hover { opacity: 1; color: #d08080; }
+
+.wish-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(61, 47, 42, 0.4);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 200;
+}
+
+.wish-modal {
+  background: var(--surface);
+  border-radius: var(--radius) var(--radius) 0 0;
+  padding: 24px 20px calc(24px + var(--safe-bottom));
+  width: 100%;
+  max-width: 480px;
+}
+
+.wish-modal-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  margin-bottom: 18px;
+}
+
+.wish-field { margin-bottom: 14px; }
+
+.wish-label {
+  display: block;
+  font-size: 12px;
+  color: var(--text3);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 5px;
+}
+
+.wish-input {
+  width: 100%;
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  font-size: 15px;
+  font-family: inherit;
+  background: var(--surface2);
+  color: var(--text);
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.wish-input:focus { border-color: var(--pink); }
+
+.wish-modal-btns {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.wish-modal-cancel {
+  flex: 1;
+  padding: 11px;
+  border: 1.5px solid var(--border2);
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text2);
+  font-size: 15px;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.wish-modal-submit {
+  flex: 2;
+  padding: 11px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--pink);
+  color: #fff;
+  font-size: 15px;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
