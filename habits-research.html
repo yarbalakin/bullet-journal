@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Исследование: блок привычек</title>
+  <style>
+    :root {
+      --bg: #0f0f13;
+      --bg2: #16161d;
+      --bg3: #1e1e2a;
+      --border: #2a2a3a;
+      --text: #e2e2f0;
+      --text-muted: #7a7a9a;
+      --accent: #7c6af7;
+      --accent2: #5dd6b5;
+      --accent3: #f79c6a;
+      --accent4: #f76a8a;
+      --green: #4ade80;
+      --yellow: #fbbf24;
+      --red: #f87171;
+      --tag-bg: #1e1e30;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    /* HERO */
+    .hero {
+      background: linear-gradient(135deg, #1a1040 0%, #0f1830 50%, #0f1820 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 60px 40px 50px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -80px; left: 50%; transform: translateX(-50%);
+      width: 600px; height: 300px;
+      background: radial-gradient(ellipse, rgba(124,106,247,0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #a78bfa, #7c6af7, #5dd6b5);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
+    }
+    .hero .meta {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .hero .meta span {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .hero .meta .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    /* LAYOUT */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    /* TOC */
+    .toc {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 32px;
+      margin: 40px 0;
+    }
+    .toc h2 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .toc ol {
+      list-style: none;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 600px) { .toc ol { grid-template-columns: 1fr; } }
+    .toc a {
+      color: var(--text);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      transition: background 0.15s;
+    }
+    .toc a:hover { background: var(--bg3); color: var(--accent); }
+    .toc .num {
+      font-size: 0.75rem;
+      background: var(--tag-bg);
+      color: var(--accent);
+      border-radius: 5px;
+      padding: 2px 7px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    /* SECTIONS */
+    .section {
+      margin-top: 60px;
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 32px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-num {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent);
+      background: rgba(124,106,247,0.12);
+      border: 1px solid rgba(124,106,247,0.3);
+      border-radius: 8px;
+      padding: 4px 10px;
+      flex-shrink: 0;
+    }
+    .section h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    /* CARDS */
+    .card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 20px;
+    }
+    .card h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card h3 .badge {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
+      background: rgba(124,106,247,0.15);
+      color: var(--accent);
+      border: 1px solid rgba(124,106,247,0.25);
+    }
+    .card p { color: var(--text-muted); margin-bottom: 12px; }
+    .card p:last-child { margin-bottom: 0; }
+    .card strong { color: var(--text); }
+    .card em { color: var(--accent2); font-style: normal; }
+
+    /* APP GRID */
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
+      gap: 20px;
+    }
+    @media (max-width: 600px) { .app-grid { grid-template-columns: 1fr; } }
+
+    .app-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .app-card-header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+    .app-icon {
+      width: 46px; height: 46px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .app-card-header h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .app-card-header .tagline {
+      font-size: 0.83rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+    .app-card-header .pill {
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 20px;
+      margin-right: 4px;
+      margin-top: 2px;
+      display: inline-block;
+    }
+    .app-body { padding: 18px 24px 20px; }
+    .app-features { list-style: none; }
+    .app-features li {
+      display: flex;
+      gap: 10px;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+    .app-features li:last-child { border-bottom: none; }
+    .app-features li::before {
+      content: '→';
+      color: var(--accent);
+      flex-shrink: 0;
+      font-size: 0.8rem;
+      margin-top: 2px;
+    }
+    .app-features li strong { color: var(--text); }
+    .app-philosophy {
+      margin-top: 14px;
+      padding: 10px 14px;
+      background: rgba(124,106,247,0.07);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .app-philosophy strong { color: var(--accent); }
+
+    /* SCIENCE CARDS */
+    .science-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 18px;
+    }
+    @media (max-width: 600px) { .science-grid { grid-template-columns: 1fr; } }
+
+    .science-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px 24px;
+    }
+    .science-card .sci-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent2);
+      margin-bottom: 8px;
+    }
+    .science-card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+    .science-card p {
+      font-size: 0.87rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 10px;
+    }
+    .science-card ul {
+      list-style: none;
+      font-size: 0.85rem;
+    }
+    .science-card ul li {
+      padding: 4px 0;
+      color: var(--text-muted);
+      display: flex;
+      gap: 8px;
+    }
+    .science-card ul li::before {
+      content: '•';
+      color: var(--accent2);
+      flex-shrink: 0;
+    }
+    .science-card ul li strong { color: var(--text); }
+    .stat-highlight {
+      display: inline-block;
+      background: rgba(93,214,181,0.1);
+      border: 1px solid rgba(93,214,181,0.2);
+      color: var(--accent2);
+      font-weight: 700;
+      font-size: 0.82rem;
+      padding: 2px 8px;
+      border-radius: 6px;
+      margin: 2px 2px;
+    }
+
+    /* UX PATTERNS */
+    .pattern-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 18px;
+    }
+    @media (max-width: 600px) { .pattern-grid { grid-template-columns: 1fr; } }
+
+    .pattern-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px 24px;
+    }
+    .pattern-card .pattern-icon {
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+    }
+    .pattern-card h3 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+    .pattern-card p, .pattern-card li {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+    .pattern-card ul { list-style: none; }
+    .pattern-card ul li { padding: 3px 0; display: flex; gap: 8px; }
+    .pattern-card ul li::before { content: '–'; color: var(--accent3); flex-shrink: 0; }
+    .pattern-card ul li strong { color: var(--text); }
+
+    /* STATS TABLE */
+    .stats-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.88rem;
+    }
+    .stats-table th {
+      background: var(--bg3);
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 10px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    .stats-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      color: var(--text-muted);
+    }
+    .stats-table td:first-child { color: var(--text); font-weight: 500; }
+    .stats-table tr:last-child td { border-bottom: none; }
+    .stats-table .effect { color: var(--accent2); font-weight: 600; }
+
+    /* PRINCIPLES */
+    .principles-list {
+      list-style: none;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    @media (max-width: 600px) { .principles-list { grid-template-columns: 1fr; } }
+    .principles-list li {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      gap: 12px;
+      font-size: 0.87rem;
+    }
+    .principles-list .pnum {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--accent);
+      background: rgba(124,106,247,0.1);
+      border-radius: 6px;
+      width: 24px; height: 24px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .principles-list .ptext { color: var(--text-muted); line-height: 1.5; }
+    .principles-list .ptext strong { color: var(--text); }
+
+    /* FEATURES CHECKLIST */
+    .feat-tier {
+      margin-bottom: 30px;
+    }
+    .feat-tier-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 5px 12px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+    }
+    .tier-must { background: rgba(74,222,128,0.12); color: var(--green); border: 1px solid rgba(74,222,128,0.25); }
+    .tier-high { background: rgba(251,191,36,0.12); color: var(--yellow); border: 1px solid rgba(251,191,36,0.25); }
+    .tier-advanced { background: rgba(124,106,247,0.12); color: var(--accent); border: 1px solid rgba(124,106,247,0.25); }
+
+    .feat-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      list-style: none;
+    }
+    @media (max-width: 600px) { .feat-list { grid-template-columns: 1fr; } }
+    .feat-list li {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      font-size: 0.85rem;
+    }
+    .feat-list .check {
+      width: 18px; height: 18px;
+      border-radius: 5px;
+      border: 1.5px solid var(--border);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .feat-list .feat-text { color: var(--text-muted); line-height: 1.45; }
+    .feat-list .feat-text strong { color: var(--text); }
+
+    /* CODE BLOCK */
+    .code-block {
+      background: #0a0a12;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 16px 0;
+    }
+    .code-header {
+      background: var(--bg3);
+      padding: 8px 16px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .code-header .lang { color: var(--accent); font-weight: 600; }
+    pre {
+      padding: 20px;
+      overflow-x: auto;
+      font-size: 0.82rem;
+      line-height: 1.6;
+    }
+    code {
+      font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
+      color: #c9d1d9;
+    }
+    .kw { color: #ff79c6; }
+    .fn { color: #50fa7b; }
+    .str { color: #f1fa8c; }
+    .cm { color: #6272a4; font-style: italic; }
+    .num { color: #bd93f9; }
+
+    /* DOT SYSTEM */
+    .dot-system {
+      display: flex;
+      gap: 16px;
+      margin: 16px 0;
+      flex-wrap: wrap;
+    }
+    .dot-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg3);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.85rem;
+    }
+    .dot-circle {
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .dot-circle.green { background: var(--green); box-shadow: 0 0 8px rgba(74,222,128,0.5); }
+    .dot-circle.yellow { background: var(--yellow); box-shadow: 0 0 8px rgba(251,191,36,0.5); }
+    .dot-circle.red { background: var(--red); box-shadow: 0 0 8px rgba(248,113,113,0.5); }
+    .dot-item .dot-desc { color: var(--text-muted); }
+    .dot-item .dot-result { color: var(--text); font-weight: 500; font-size: 0.8rem; }
+
+    /* ARCHITECTURE */
+    .arch-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 700px) { .arch-grid { grid-template-columns: 1fr; } }
+
+    /* DONT LIST */
+    .dont-list {
+      list-style: none;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 600px) { .dont-list { grid-template-columns: 1fr; } }
+    .dont-list li {
+      background: rgba(248,113,113,0.05);
+      border: 1px solid rgba(248,113,113,0.15);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: flex;
+      gap: 10px;
+    }
+    .dont-list li::before {
+      content: '✕';
+      color: var(--red);
+      flex-shrink: 0;
+      font-weight: 700;
+    }
+
+    /* POWER COMBO */
+    .power-combo {
+      background: linear-gradient(135deg, rgba(124,106,247,0.1), rgba(93,214,181,0.06));
+      border: 1px solid rgba(124,106,247,0.25);
+      border-radius: 16px;
+      padding: 24px 28px;
+      margin-top: 24px;
+    }
+    .power-combo h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+    .power-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .power-tags .ptag {
+      background: rgba(124,106,247,0.12);
+      border: 1px solid rgba(124,106,247,0.25);
+      color: var(--text);
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .power-tags .plus {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* WIREFRAME */
+    .wireframe {
+      background: #0a0a12;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      font-family: 'JetBrains Mono', Consolas, monospace;
+      font-size: 0.78rem;
+      color: #8888aa;
+      line-height: 1.7;
+      overflow-x: auto;
+    }
+    .wireframe .wh { color: var(--text-muted); }
+    .wireframe .wa { color: var(--accent2); }
+    .wireframe .wg { color: var(--green); }
+    .wireframe .wy { color: var(--yellow); }
+
+    /* DIVIDER */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 48px 0;
+    }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 24px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    /* Util */
+    .mt-16 { margin-top: 16px; }
+    .mt-24 { margin-top: 24px; }
+    .mb-16 { margin-bottom: 16px; }
+    .text-muted { color: var(--text-muted); font-size: 0.87rem; }
+
+    /* NARRATIVE BRIDGE */
+    .narrative-bridge {
+      background: linear-gradient(135deg, rgba(124,106,247,0.05), rgba(93,214,181,0.03));
+      border-left: 3px solid var(--accent);
+      border-radius: 0 12px 12px 0;
+      padding: 16px 22px;
+      margin-bottom: 28px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+    .narrative-bridge strong { color: var(--text); }
+
+    /* LOGIC BLOCK */
+    .logic-block {
+      background: var(--bg2);
+      border: 1px solid rgba(124,106,247,0.25);
+      border-radius: 16px;
+      padding: 28px 32px;
+      margin: 32px 0 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    .logic-block::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3));
+    }
+    .logic-block h3 {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+    .logic-block p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.75;
+      margin-bottom: 10px;
+    }
+    .logic-block p:last-child { margin-bottom: 0; }
+    .logic-block strong { color: var(--text); }
+
+    /* SVG DIAGRAMS */
+    .svg-wrap {
+      display: flex;
+      justify-content: center;
+      margin: 28px 0;
+    }
+    .svg-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 10px;
+      margin-bottom: 24px;
+    }
+    .svg-row {
+      display: flex;
+      gap: 32px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 28px 0;
+      align-items: flex-start;
+    }
+    .svg-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* PHONE MOCKUP */
+    .phone-mockup-wrap {
+      display: flex;
+      justify-content: center;
+      margin: 32px 0 16px;
+    }
+    .phone-mockup {
+      width: 260px;
+      height: 520px;
+      background: #0a0a12;
+      border-radius: 36px;
+      border: 2px solid var(--border);
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+      flex-shrink: 0;
+    }
+    .phone-notch {
+      width: 80px; height: 22px;
+      background: #0a0a12;
+      border-radius: 0 0 14px 14px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+    .phone-screen {
+      width: 100%; height: calc(100% - 22px);
+      overflow: hidden;
+    }
+    .phones-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      margin: 32px 0;
+    }
+    @media (max-width: 640px) { .phones-row { grid-template-columns: 1fr; } }
+    .phone-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .phone-card-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 12px;
+    }
+    .phone-card-label strong { color: var(--text); display: block; margin-bottom: 2px; }
+  </style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Исследование: блок привычек</h1>
+  <div class="meta">
+    <span><span class="dot"></span>2026-04-17</span>
+    <span><span class="dot"></span>6 агентов</span>
+    <span><span class="dot"></span>~150 источников</span>
+    <span><span class="dot"></span>Bullet Journal Project</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- TOC -->
+  <nav class="toc">
+    <h2>Содержание</h2>
+    <ol>
+      <li><a href="#science"><span class="num">01</span>Наука о формировании привычек</a></li>
+      <li><a href="#apps"><span class="num">02</span>Лучшие приложения — механики</a></li>
+      <li><a href="#ux"><span class="num">03</span>UI/UX паттерны и визуализация</a></li>
+      <li><a href="#features"><span class="num">04</span>Список фич для реализации</a></li>
+      <li><a href="#arch"><span class="num">05</span>Рекомендуемая архитектура</a></li>
+    </ol>
+  </nav>
+
+  <!-- LOGIC OF RESEARCH -->
+  <div class="logic-block">
+    <h3>Логика исследования</h3>
+    <p>Мы начали с нейронауки, потому что <strong>дизайн без понимания мозга — это угадывание</strong>. Сначала нужно понять, как формируются привычки на уровне нейронных путей, почему потеря ощущается сильнее приобретения, и что именно происходит в момент «дофаминового ожидания».</p>
+    <p>Имея нейронаучную базу, мы посмотрели на лучшие приложения — не чтобы скопировать интерфейс, а <strong>чтобы найти паттерны, которые уже доказали эффективность</strong> на миллионах пользователей. Каждая механика в Streaks, Habitica и Loop — это воплощённая поведенческая наука.</p>
+    <p>Далее — UI/UX слой: как именно визуализировать прогресс, чтобы создать «ментальный зуд» незакрытого кольца, и почему GitHub-heatmap читается лучше любой таблицы. <strong>Визуализация — это не украшение, это механика мотивации.</strong></p>
+    <p>В итоге мы составили приоритизированный список фич и архитектурную схему. Всё в логичном порядке: от «зачем» через «как другие решали» к «что строим».</p>
+  </div>
+
+  <!-- ===== SECTION 1: SCIENCE ===== -->
+  <section class="section" id="science">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2>Наука о формировании привычек</h2>
+    </div>
+
+    <div class="science-grid">
+
+      <div class="science-card">
+        <div class="sci-label">MIT Neuroscience</div>
+        <h3>Петля привычки (Habit Loop)</h3>
+        <p>Модель: <strong>cue → routine → reward</strong>. Дофамин выделяется сильнее в момент <em>ожидания</em> награды, чем при её получении — отсюда аддиктивность трекеров.</p>
+        <ul>
+          <li><strong>Cue:</strong> напоминание в якорный момент (кофе, открытие телефона)</li>
+          <li><strong>Routine:</strong> одно касание — никаких модальных окон</li>
+          <li><strong>Reward:</strong> анимация + цвет <em>в момент отметки</em>, не потом</li>
+        </ul>
+      </div>
+
+      <div class="science-card">
+        <div class="sci-label">Канеман & Тверски</div>
+        <h3>Don't Break the Chain</h3>
+        <p>Потеря ощущается <strong>вдвое сильнее</strong>, чем равноценное приобретение. Серия в 20 дней субъективно огромна.</p>
+        <ul>
+          <li>Duolingo: разделение цели и стрика → <span class="stat-highlight">+10.5%</span> пользователей на стрике за 20 дней</li>
+          <li>Streak Freeze: <span class="stat-highlight">+23%</span> долгосрочный retention (ACM CHI 2019)</li>
+          <li>Goal-Gradient Effect: чем ближе к рекорду — тем выше мотивация</li>
+        </ul>
+      </div>
+
+      <div class="science-card">
+        <div class="sci-label">Голлвитцер, NYU 1999</div>
+        <h3>Implementation Intentions</h3>
+        <p>Формула: <strong>"если [ситуация Y], то я сделаю [Z]"</strong>. Метаанализ: цели с implementation intentions выполняются в <span class="stat-highlight">2–3×</span> чаще.</p>
+        <ul>
+          <li>При создании привычки: вопрос "когда, где, после чего?"</li>
+          <li>Напоминание приходит не "в 8:00", а привязкой к якорному событию</li>
+          <li>Мозг переключается с сознательного усилия на автоматическую реакцию</li>
+        </ul>
+      </div>
+
+      <div class="science-card">
+        <div class="sci-label">BJ Fogg, Stanford</div>
+        <h3>Habit Stacking</h3>
+        <p>Новое поведение <strong>паразитирует</strong> на уже существующем нейронном пути. "После [якоря] я сделаю [новое]".</p>
+        <ul>
+          <li>Привычки группировать в рутины (утренняя / рабочая / вечерняя)</li>
+          <li>Якорное поведение уже существует — не нужен отдельный триггер</li>
+          <li>Для онбординга: "какие ритуалы уже есть?" → предложить якоря</li>
+        </ul>
+      </div>
+
+      <div class="science-card">
+        <div class="sci-label">UCL Lally, 2010</div>
+        <h3>Оптимальное количество привычек</h3>
+        <p>Среднее время формирования привычки — <strong>66 дней</strong> (диапазон 18–254). Самоконтроль — исчерпаемый ресурс (Баумайстер).</p>
+        <ul>
+          <li>Рекомендация: <strong>1–3 активных привычки</strong> одновременно</li>
+          <li>Разблокировка новых привычек после 30+ дней предыдущей</li>
+          <li>Разделение: "Активные" vs "Автоматические" — разный приоритет</li>
+        </ul>
+      </div>
+
+      <div class="science-card">
+        <div class="sci-label">James Clear / Penn Research</div>
+        <h3>Работа с пропусками</h3>
+        <p>"What-the-hell effect": один срыв ведёт к полному отказу. JPSPsych 2020: на <span class="stat-highlight">63%</span> чаще бросали после первого пропуска.</p>
+        <ul>
+          <li><strong>Never Miss Twice:</strong> "Раз — случайность, дважды — новая привычка"</li>
+          <li><strong>Penn Reset Rule:</strong> вернуться в 24ч → <span class="stat-highlight">+71%</span> долгосрочного удержания</li>
+          <li>Нейтральный тон при пропуске: "вчера не было отметки, продолжаем?"</li>
+        </ul>
+      </div>
+
+      <div class="science-card">
+        <div class="sci-label">ASTD Research</div>
+        <h3>Социальная подотчётность</h3>
+        <p>Вероятность достижения цели: <span class="stat-highlight">65%</span> с партнёром, <span class="stat-highlight">95%</span> при назначенных встречах.</p>
+        <ul>
+          <li>Публичный профиль / лента</li>
+          <li>Уведомление другу о прогрессе</li>
+          <li>Совместный стрик с партнёром</li>
+          <li>Финансовый залог (Beeminder)</li>
+          <li><strong>Сильнейшее:</strong> провал = последствия для других (Habitica)</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ===== SECTION 2: APPS ===== -->
+  <section class="section" id="apps">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2>Лучшие приложения — ключевые механики</h2>
+    </div>
+
+    <div class="app-grid">
+
+      <!-- Streaks -->
+      <div class="app-card">
+        <div class="app-card-header">
+          <div class="app-icon" style="background: linear-gradient(135deg,#ff6b35,#f7c948);">🔥</div>
+          <div>
+            <h3>Streaks</h3>
+            <div class="tagline">Apple Design Award 2016 · iOS only · $4.99</div>
+            <span class="pill" style="background:rgba(255,107,53,0.15);color:#ff6b35;border:1px solid rgba(255,107,53,0.25)">Loss Aversion</span>
+          </div>
+        </div>
+        <div class="app-body">
+          <ul class="app-features">
+            <li><strong>Прогресс-кольца</strong> — каждая привычка = круг, как Apple Activity Rings</li>
+            <li><strong>Тройная сенсорная обратная связь:</strong> анимация + звук + вибрация при выполнении</li>
+            <li><strong>Long-press для завершения</strong> — защита от случайных кликов, создаёт осознанность</li>
+            <li><strong>3 типа задач:</strong> да/нет, негативные (засчитывается если НЕ сделал), с таймером</li>
+            <li><strong>Best Streak</strong> — лучшая серия за всё время как долгосрочный мотиватор</li>
+            <li><strong>Паттерны по дням недели</strong> — в какой день чаще выполняется привычка</li>
+            <li><strong>Паттерны по времени суток</strong> — когда обычно закрывается задача</li>
+            <li>78 цветовых тем, 600+ иконок, Shortcuts интеграция</li>
+          </ul>
+          <div class="app-philosophy"><strong>Философия:</strong> один мощный психологический якорь — стрик. Минимум геймификации намеренно.</div>
+        </div>
+      </div>
+
+      <!-- Habitica -->
+      <div class="app-card">
+        <div class="app-card-header">
+          <div class="app-icon" style="background: linear-gradient(135deg,#7c3aed,#a855f7);">⚔️</div>
+          <div>
+            <h3>Habitica</h3>
+            <div class="tagline">Web/iOS/Android · Open Source · RPG трекер</div>
+            <span class="pill" style="background:rgba(168,85,247,0.15);color:#a855f7;border:1px solid rgba(168,85,247,0.25)">Variable Reward</span>
+            <span class="pill" style="background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.25)">Social Pressure</span>
+          </div>
+        </div>
+        <div class="app-body">
+          <ul class="app-features">
+            <li><strong>Task Value Color System:</strong> цвет меняется автоматически — жёлтый → зелёный (выполняется) → красный (пропускается). Визуальная аналитика без цифр.</li>
+            <li><strong>Party + квесты:</strong> провал Daily = босс атакует <em>всю группу</em>. Сильнейший механизм.</li>
+            <li><strong>Custom Rewards:</strong> "50 золота → посмотри серию". Пользователь сам определяет награды.</li>
+            <li><strong>Классы персонажа</strong> (уровень 10+): Warrior, Mage, Healer, Rogue</li>
+            <li><strong>Пауза урона:</strong> отдых без штрафов, честно перед собой</li>
+            <li><strong>Чеклист внутри задачи:</strong> подзадачи внутри привычки</li>
+            <li>Группы: <span class="stat-highlight">+51%</span> social engagement · Челленджи: <span class="stat-highlight">+39%</span> retention</li>
+          </ul>
+          <div class="app-philosophy"><strong>Философия:</strong> переменное подкрепление + социальное давление. Для людей с внешней мотивацией.</div>
+        </div>
+      </div>
+
+      <!-- Fabulous -->
+      <div class="app-card">
+        <div class="app-card-header">
+          <div class="app-icon" style="background: linear-gradient(135deg,#f59e0b,#fbbf24);">✨</div>
+          <div>
+            <h3>Fabulous</h3>
+            <div class="tagline">iOS/Android · Duke Behavioral Economics Lab</div>
+            <span class="pill" style="background:rgba(245,158,11,0.15);color:#fbbf24;border:1px solid rgba(245,158,11,0.25)">Narrative Coaching</span>
+          </div>
+        </div>
+        <div class="app-body">
+          <ul class="app-features">
+            <li><strong>Journeys:</strong> многодневные программы как "главы истории". "In which [имя] learns..."</li>
+            <li><strong>Routine Builder:</strong> рутина как связанная цепочка, не разрозненный список</li>
+            <li><strong>Anchor sounds + таймеры:</strong> звук капли воды для гидратации — ассоциированный триггер</li>
+            <li><strong>Full-screen mode:</strong> иллюстрация + таймер + фоновая музыка = "ритуальное пространство"</li>
+            <li><strong>Pre-commitment contracts:</strong> подпись отпечатком пальца перед работой</li>
+            <li><strong>31-экранный onboarding:</strong> sunk cost → эмоциональная привязанность до начала</li>
+            <li><strong>Three Mountains:</strong> Фундамент → Мышление → Видение — долгосрочная карта</li>
+          </ul>
+          <div class="app-philosophy"><strong>Философия:</strong> "ты пишешь следующую главу своей истории". Для людей с амбициями.</div>
+        </div>
+      </div>
+
+      <!-- Finch -->
+      <div class="app-card">
+        <div class="app-card-header">
+          <div class="app-icon" style="background: linear-gradient(135deg,#10b981,#34d399);">🐦</div>
+          <div>
+            <h3>Finch</h3>
+            <div class="tagline">iOS/Android · Self-care pet app</div>
+            <span class="pill" style="background:rgba(16,185,129,0.15);color:#34d399;border:1px solid rgba(16,185,129,0.25)">Zero Shame</span>
+            <span class="pill" style="background:rgba(16,185,129,0.15);color:#34d399;border:1px solid rgba(16,185,129,0.25)">Care Transfer</span>
+          </div>
+        </div>
+        <div class="app-body">
+          <ul class="app-features">
+            <li><strong>Виртуальный питомец:</strong> растёт через жизненные стадии. "Я делаю это для птицы" — снижает сопротивление</li>
+            <li><strong>Adventures:</strong> питомец в 6-часовых приключениях → органичные точки возврата без навязчивых уведомлений</li>
+            <li><strong>Zero-shame mechanics:</strong> никаких штрафов, птица терпеливо ждёт</li>
+            <li><strong>One Metric:</strong> Energy — один показатель дня, не множество конкурирующих метрик</li>
+            <li><strong>Living Widget:</strong> живой питомец на рабочем столе</li>
+            <li><strong>Social без конкуренции:</strong> визиты, подарки без leaderboards</li>
+            <li><strong>Seasonal events:</strong> ежемесячное обновление визуального оформления</li>
+          </ul>
+          <div class="app-philosophy"><strong>Для ADHD:</strong> "единственное приложение, которое выжило у меня дольше двух недель."</div>
+        </div>
+      </div>
+
+      <!-- Strides -->
+      <div class="app-card">
+        <div class="app-card-header">
+          <div class="app-icon" style="background: linear-gradient(135deg,#0ea5e9,#38bdf8);">🎯</div>
+          <div>
+            <h3>Strides</h3>
+            <div class="tagline">iOS · Goal-first трекер · 150+ шаблонов</div>
+            <span class="pill" style="background:rgba(14,165,233,0.15);color:#38bdf8;border:1px solid rgba(14,165,233,0.25)">Result-Oriented</span>
+          </div>
+        </div>
+        <div class="app-body">
+          <p style="font-size:0.83rem;color:var(--text-muted);margin-bottom:12px;">4 архитектурно разных типа трекеров:</p>
+          <ul class="app-features">
+            <li><strong>Habit Tracker</strong> (да/нет): хорошие и плохие привычки, свайп</li>
+            <li><strong>Target Tracker</strong> (цель к дате): "прочитать 24 книги к 31 декабря" → автоматический расчёт темпа</li>
+            <li><strong>Average Tracker</strong> (скользящее среднее): средний сон, среднее давление</li>
+            <li><strong>Project / Milestone Tracker:</strong> цель → вехи с % выполнения</li>
+            <li><strong>Pace Line:</strong> "где ты должен быть сейчас". Зелёный = на треке, красный = отставание</li>
+            <li><strong>Projected Trend Line:</strong> экстраполяция текущего темпа в будущее</li>
+            <li><strong>Bad Habit режим:</strong> прогресс-бар начинается полным (100%) и убывает</li>
+            <li><strong>Tags + Reports по тегу:</strong> аналитика по сфере жизни</li>
+          </ul>
+          <div class="app-philosophy"><strong>Философия:</strong> "am I on track to hit my goal?" — ориентация на результат.</div>
+        </div>
+      </div>
+
+      <!-- HabitBull -->
+      <div class="app-card">
+        <div class="app-card-header">
+          <div class="app-icon" style="background: linear-gradient(135deg,#dc2626,#f87171);">🐂</div>
+          <div>
+            <h3>HabitBull</h3>
+            <div class="tagline">iOS/Android · Don't break the chain</div>
+            <span class="pill" style="background:rgba(220,38,38,0.15);color:#f87171;border:1px solid rgba(220,38,38,0.25)">Consistency-First</span>
+          </div>
+        </div>
+        <div class="app-body">
+          <p style="font-size:0.83rem;color:var(--text-muted);margin-bottom:10px;">Трёхцветная dot-система (ключевой механизм):</p>
+          <div class="dot-system">
+            <div class="dot-item"><div class="dot-circle green"></div><div><div style="font-size:0.83rem;color:var(--text)">Обязателен + выполнен</div><div class="dot-result">Серия продолжается</div></div></div>
+            <div class="dot-item"><div class="dot-circle yellow"></div><div><div style="font-size:0.83rem;color:var(--text)">Необязательный день</div><div class="dot-result">Серия продолжается</div></div></div>
+            <div class="dot-item"><div class="dot-circle red"></div><div><div style="font-size:0.83rem;color:var(--text)">Обязателен + провален</div><div class="dot-result">Серия прерывается</div></div></div>
+          </div>
+          <ul class="app-features mt-16">
+            <li><strong>HabitBull Score:</strong> составная метрика (серии + успешность), таргет 100%</li>
+            <li><strong>Habit Notes:</strong> long tap на день = заметка. Все заметки месяца рядом с календарём</li>
+            <li><strong>Повторяющиеся напоминания:</strong> "каждые 2 часа с 9 до 21" для "пить воду"</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Loop -->
+      <div class="app-card">
+        <div class="app-card-header">
+          <div class="app-icon" style="background: linear-gradient(135deg,#4ade80,#22c55e);">∞</div>
+          <div>
+            <h3>Loop Habit Tracker</h3>
+            <div class="tagline">Android · Open Source · GPLv3 · Бесплатно</div>
+            <span class="pill" style="background:rgba(74,222,128,0.15);color:#4ade80;border:1px solid rgba(74,222,128,0.25)">Habit Score</span>
+          </div>
+        </div>
+        <div class="app-body">
+          <ul class="app-features">
+            <li><strong>Habit Score (0–100%):</strong> экспоненциальное сглаживание. Пропуск НЕ обнуляет — ослабляет. 80% силы за месяц, 99% за три.</li>
+            <li><strong>Skip ≠ Miss:</strong> долгое нажатие = "уважительный пропуск", не влияет на счёт</li>
+            <li><strong>5 графиков</strong> (свайп): habit score, столбчатый, heatmap, серии, частота</li>
+            <li><strong>Числовые привычки:</strong> порог "не менее / не более X" с единицей измерения</li>
+            <li>Нет аккаунта, нет облака, нет рекламы, нет пэйволла</li>
+          </ul>
+          <div class="app-philosophy"><strong>Алгоритм:</strong> score = score + alpha × (done − score). Пропуск ослабляет, не убивает.</div>
+        </div>
+      </div>
+
+      <!-- Notion -->
+      <div class="app-card">
+        <div class="app-card-header">
+          <div class="app-icon" style="background: linear-gradient(135deg,#374151,#6b7280);">📋</div>
+          <div>
+            <h3>Notion</h3>
+            <div class="tagline">Web/Mobile · Гибкость > Специализация</div>
+            <span class="pill" style="background:rgba(107,114,128,0.15);color:#9ca3af;border:1px solid rgba(107,114,128,0.25)">Context-First</span>
+          </div>
+        </div>
+        <div class="app-body">
+          <ul class="app-features">
+            <li><strong>Day Score:</strong> % выполненных привычек за день как агрегат</li>
+            <li><strong>Progress Bar:</strong> строковая формула ████░░░ (80%) прямо в базе</li>
+            <li><strong>Motivational messages:</strong> условный текст по уровню выполнения (&gt;80% / &lt;40%)</li>
+            <li><strong>Repeating Templates:</strong> запись дня создаётся автоматически</li>
+            <li><strong>Связь с целями:</strong> показывает "зачем" рядом с "что"</li>
+            <li><strong>Heatmap шаблоны:</strong> 53-недельный GitHub-style, 6-уровневый градиент</li>
+          </ul>
+          <div class="app-philosophy"><strong>Минус:</strong> нет push-уведомлений, нет нативного streak. Зато всё в одном контексте.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ===== SECTION 3: UX ===== -->
+  <section class="section" id="ux">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2>UI/UX паттерны и визуализация</h2>
+    </div>
+
+    <div class="pattern-grid">
+
+      <div class="pattern-card">
+        <div class="pattern-icon">🔥</div>
+        <h3>Heatmap Calendar</h3>
+        <p><strong>GitHub-стиль</strong> — самый читаемый. Сетка 52×7, интенсивность = активность.</p>
+        <ul>
+          <li>Ячейки строго квадратные</li>
+          <li>Видны провалы, полосы, сезонные паттерны</li>
+          <li>Минимум = светло-серый, максимум = акцент</li>
+          <li><strong>Duolingo-стиль:</strong> glow-эффект + анимированное пламя. Серия 7+ дней = <span class="stat-highlight">×2.4</span> возвраты</li>
+        </ul>
+      </div>
+
+      <div class="pattern-card">
+        <div class="pattern-icon">💍</div>
+        <h3>Activity Rings (Apple Watch)</h3>
+        <p><strong>Принцип Гештальта:</strong> незакрытое кольцо создаёт "ментальный зуд".</p>
+        <ul>
+          <li>Одно кольцо — заполнение по дням недели (7 сегментов)</li>
+          <li>Центр: число выполнений или %</li>
+          <li>При закрытии — анимация "взрыва"</li>
+          <li>Уникальный цвет на каждую привычку</li>
+          <li>24-часовой сброс: близко, но не давит</li>
+        </ul>
+      </div>
+
+      <div class="pattern-card">
+        <div class="pattern-icon">⏱</div>
+        <h3>Разбивка по времени суток</h3>
+        <p>Лучший паттерн для habit stacking. Снижает когнитивную нагрузку.</p>
+        <ul>
+          <li>3 секции: Утро / День / Вечер</li>
+          <li>Иконки: рассвет / солнце / луна</li>
+          <li><strong>Прогресс-бар секции:</strong> "Утро: 3/5 выполнено"</li>
+          <li>Показывать только актуальные привычки сейчас</li>
+        </ul>
+      </div>
+
+      <div class="pattern-card">
+        <div class="pattern-icon">📊</div>
+        <h3>Streak Counter Psychology</h3>
+        <p>Sunk Cost: боль от потери серии сильнее радости от продолжения.</p>
+        <ul>
+          <li>Большое жирное число + иконка огня</li>
+          <li>Цвет по накалу: жёлтый → оранжевый → красный</li>
+          <li>Milestone-анимации: 7, 14, 30, 100, 365 дней</li>
+          <li>"Сегодня" выделен: есть ли уже чекмарк</li>
+        </ul>
+      </div>
+
+      <div class="pattern-card">
+        <div class="pattern-icon">📅</div>
+        <h3>Недельный / Месячный обзор</h3>
+        <p>Разделять интерфейс действия и интерфейс анализа — смешение убивает оба.</p>
+        <ul>
+          <li><strong>Неделя:</strong> 7 ячеек × привычка. Хорошо при 5–8 привычках</li>
+          <li><strong>Месяц:</strong> мини-сетка 4–5 недель, каждый день = точка</li>
+          <li>Инсайт: "в середине месяца всегда провал"</li>
+          <li>Цветное кодирование различимо без чтения текста</li>
+        </ul>
+      </div>
+
+      <div class="pattern-card">
+        <div class="pattern-icon">🎨</div>
+        <h3>Цветовое кодирование</h3>
+        <p>Три уровня сложности — выбирать под задачу.</p>
+        <ul>
+          <li><strong>Бинарный:</strong> выполнено = акцент, пропущено = серый</li>
+          <li><strong>Градиентный:</strong> частичное выполнение = промежуток</li>
+          <li><strong>Mood + completion:</strong> оттенок = настроение, интенсивность = выполнение. Видна корреляция.</li>
+          <li>Тёмный фон: #121212 + слабо насыщенные акценты</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- Stats Table -->
+    <div class="card mt-24">
+      <h3>Ключевые метрики вовлечённости (данные)</h3>
+      <table class="stats-table mt-16">
+        <thead>
+          <tr>
+            <th>Механика</th>
+            <th>Эффект</th>
+            <th>Источник</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Серия 7 дней</td><td class="effect">+140% вероятность вернуться завтра</td><td>Duolingo</td></tr>
+          <tr><td>Анимация при закрытии кольца</td><td class="effect">+1.7% retention на D7</td><td>Duolingo A/B</td></tr>
+          <tr><td>Streak Wager / Freeze</td><td class="effect">+14% retention на D14</td><td>ACM CHI 2019</td></tr>
+          <tr><td>Прогресс-бар + мгновенный цвет</td><td class="effect">+30% соблюдение привычки</td><td>Cohorty Research</td></tr>
+          <tr><td>Streak Freeze (1 день)</td><td class="effect">Снижает отток при пропуске</td><td>Duolingo</td></tr>
+          <tr><td>Партнёр по accountability</td><td class="effect">65% → 95% вероятность цели</td><td>ASTD</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 7 Principles -->
+    <div class="mt-24">
+      <p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);margin-bottom:16px;">7 принципов UI</p>
+      <ul class="principles-list">
+        <li><span class="pnum">1</span><span class="ptext"><strong>Одно касание = действие.</strong> Отметить выполненной — максимум 1 тап, без модалок.</span></li>
+        <li><span class="pnum">2</span><span class="ptext"><strong>Мгновенный отклик.</strong> Цвет меняется без задержки, анимация в момент отметки.</span></li>
+        <li><span class="pnum">3</span><span class="ptext"><strong>Прогресс, а не перфекционизм.</strong> Пропуск — не конец, а событие с нейтральным тоном.</span></li>
+        <li><span class="pnum">4</span><span class="ptext"><strong>Вариативные уведомления.</strong> Один текст умирает через 2–4 недели.</span></li>
+        <li><span class="pnum">5</span><span class="ptext"><strong>Пустой экран = враг.</strong> 3–5 стартовых привычек при онбординге сразу.</span></li>
+        <li><span class="pnum">6</span><span class="ptext"><strong>Milestone-анимации.</strong> 7, 30, 100 дней — отдельная анимация, не просто смена числа.</span></li>
+        <li><span class="pnum">7</span><span class="ptext"><strong>Социальное сравнение по %</strong> выполнения, не по дням — уравнивает новичков и ветеранов.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ===== SECTION 4: FEATURES ===== -->
+  <section class="section" id="features">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2>Большой список фич для реализации</h2>
+    </div>
+
+    <!-- Must Have -->
+    <div class="feat-tier">
+      <div class="feat-tier-label tier-must">Must-Have — максимальная доказательная база</div>
+      <ul class="feat-list">
+        <li><div class="check"></div><div class="feat-text"><strong>Два типа привычек:</strong> да/нет и числовые (порог "не менее / не более X")</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>Habit Score</strong> вместо простого стрика: экспоненциальное сглаживание. Пропуск ослабляет, не обнуляет.</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>Трёхцветная dot-система</strong> (зелёный / жёлтый / красный) — необязательные дни без потери серии</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>Skip-статус:</strong> "уважительный пропуск" — не влияет на счёт</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>Отметка в одно касание</strong> с главного экрана, без перехода в детали</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>Celebration animation</strong> прямо в момент отметки (петля привычки)</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>Streak + Best Streak</strong> — отдельный показатель лучшей серии за всё время</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>Never Miss Twice:</strong> нейтральное, не обвинительное сообщение при пропуске</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>Habit Notes:</strong> long-tap на день = заметка к этому дню</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>Прогресс-бар блока:</strong> "Утро: 3/5 выполнено"</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>Day Score:</strong> % выполненных привычек за день как агрегат вверху экрана</div></li>
+      </ul>
+    </div>
+
+    <!-- High Value -->
+    <div class="feat-tier">
+      <div class="feat-tier-label tier-high">High-Value — хорошая доказательная база</div>
+      <ul class="feat-list">
+        <li><div class="check"></div><div class="feat-text"><strong>Разбивка по времени суток:</strong> Утро / День / Вечер с отдельными секциями</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>Негативные привычки:</strong> прогресс-бар начинается полным и убывает (не сделал = успех)</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>Pace Line</strong> для числовых привычек: "где ты должен быть сейчас" при цели к дате</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>Streak Freeze:</strong> 1–2 "заморозки" в запасе</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>Гибкий стрик:</strong> "N из 7 дней = серия продолжается"</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>Ретроспективный процент:</strong> "80% за 30 дней" отдельно от стрика</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>Retroactive logging:</strong> тап на прошедшую дату для редактирования</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>Tags / категории:</strong> группировка по сфере жизни</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>Milestone-анимации:</strong> 7, 14, 30, 100, 365 дней — отдельная анимация</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>Motivational messages:</strong> условный текст по уровню дня</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>Цветовая система по истории</strong> (Habitica-паттерн): цвет меняется автоматически</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>Habit Stacking visual:</strong> привычки в рутине как связанная цепочка</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>Подзадачи внутри привычки</strong> (чеклист)</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>Custom Rewards:</strong> заработать очки → разблокировать личную награду</div></li>
+      </ul>
+    </div>
+
+    <!-- Advanced -->
+    <div class="feat-tier">
+      <div class="feat-tier-label tier-advanced">Advanced — инновационный край</div>
+      <ul class="feat-list">
+        <li><div class="check"></div><div class="feat-text"><strong>Target Tracker</strong> (цель к дате): "24 книги к 31 декабря" → автоматический расчёт темпа</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>Average Tracker:</strong> скользящее среднее без жёсткой ежедневной цели</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>Implementation intentions:</strong> при создании вопрос "когда, где, после чего?"</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>Нарративный фрейм:</strong> каждый месяц = "глава": "Апрель: глава про дисциплину"</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>Partner accountability:</strong> взаимные уведомления, общий streak</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>Паттерны по дням недели:</strong> в какой день чаще выполняется привычка</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>Паттерны по времени суток:</strong> когда обычно закрывается задача</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>Сезонные сбросы:</strong> ежемесячное визуальное обновление для ощущения нового начала</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>Reflection on completion:</strong> микропромпт "что заметил?" при отметке</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>Лимит активных привычек:</strong> рекомендация ≤3 новичку, разблокировка после 30+ дней</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>One Metric виджет:</strong> Energy-подобный суммарный показатель для PWA</div></li>
+        <li><div class="check"></div><div class="feat-text"><strong>Финансовый залог</strong> (опция): Beeminder-модель — деньги при пропуске</div></li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ===== SECTION 5: ARCHITECTURE ===== -->
+  <section class="section" id="arch">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <h2>Рекомендуемая архитектура блока</h2>
+    </div>
+
+    <div class="arch-grid">
+
+      <div>
+        <p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);margin-bottom:12px;">Модель данных</p>
+        <div class="code-block">
+          <div class="code-header"><span class="lang">JavaScript</span> habit object schema</div>
+          <pre><code>{
+  <span class="str">id</span>: string,
+  <span class="str">name</span>: string,
+  <span class="str">type</span>: <span class="str">'boolean'</span> | <span class="str">'number'</span> | <span class="str">'negative'</span>,
+  <span class="str">schedule</span>: {
+    <span class="str">days</span>: number[],     <span class="cm">// 0-6, дни недели</span>
+    <span class="str">frequency</span>: number,  <span class="cm">// раз в неделю</span>
+  },
+  <span class="str">goal</span>?: {
+    <span class="str">target</span>: number,
+    <span class="str">deadline</span>: string,   <span class="cm">// ISO date</span>
+    <span class="str">unit</span>: string,
+  },
+  <span class="str">category</span>: string,  <span class="cm">// утро / день / вечер</span>
+  <span class="str">color</span>: string,
+  <span class="str">reminder</span>?: { <span class="str">time</span>: string, <span class="str">days</span>: number[] },
+  <span class="str">logs</span>: {
+    [date: string]: {
+      <span class="str">status</span>: <span class="str">'done'</span>|<span class="str">'skip'</span>|<span class="str">'miss'</span>|<span class="str">'partial'</span>,
+      <span class="str">value</span>?: number,
+      <span class="str">note</span>?: string,
+    }
+  }
+}</code></pre>
+        </div>
+      </div>
+
+      <div>
+        <p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);margin-bottom:12px;">Алгоритм Habit Score (Loop)</p>
+        <div class="code-block">
+          <div class="code-header"><span class="lang">JavaScript</span> exponential smoothing</div>
+          <pre><code><span class="cm">// Экспоненциальное сглаживание
+// Loop использует alpha ≈ 0.1</span>
+<span class="kw">function</span> <span class="fn">habitScore</span>(logs, alpha = <span class="num">0.1</span>) {
+  <span class="kw">let</span> score = <span class="num">0</span>;
+  <span class="kw">const</span> dates = Object.<span class="fn">keys</span>(logs).<span class="fn">sort</span>();
+
+  <span class="kw">for</span> (<span class="kw">const</span> date <span class="kw">of</span> dates) {
+    <span class="kw">const</span> done = logs[date].status === <span class="str">'done'</span> ? <span class="num">1</span> : <span class="num">0</span>;
+    score = score + alpha * (done - score);
+  }
+
+  <span class="cm">// 80% силы за месяц, 99% за три</span>
+  <span class="kw">return</span> Math.<span class="fn">round</span>(score * <span class="num">100</span>); <span class="cm">// 0–100%</span>
+}</code></pre>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Wireframe -->
+    <div class="mt-24">
+      <p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);margin-bottom:12px;">Главный экран — скетч</p>
+      <div class="wireframe">
+<span class="wh">┌─────────────────────────────────────────────────┐</span>
+<span class="wh">│</span> ПРИВЫЧКИ                   <span class="wa">День: ████░ 80%</span>     <span class="wh">│</span>
+<span class="wh">├─────────────────────────────────────────────────┤</span>
+<span class="wh">│</span> ☀️  <span class="wh">УТРО</span>                        <span class="wa">3/4  ████░</span>     <span class="wh">│</span>
+<span class="wh">│</span>   <span class="wg">●</span> Медитация      <span class="wy">🔥 12</span>   пн вт ср <span class="wg">✓</span>         <span class="wh">│</span>
+<span class="wh">│</span>   <span class="wg">●</span> Зарядка        <span class="wy">🔥  5</span>   пн вт ·· <span class="wg">✓</span>         <span class="wh">│</span>
+<span class="wh">│</span>   <span class="wg">●</span> Стакан воды    <span class="wy">🔥 30</span>   ·· ·· ·· <span class="wg">✓</span>         <span class="wh">│</span>
+<span class="wh">│</span>   ○ Дневник        <span class="wy">🔥  2</span>   пн вт ср ○         <span class="wh">│</span>
+<span class="wh">├─────────────────────────────────────────────────┤</span>
+<span class="wh">│</span> ☁️  <span class="wh">ДЕНЬ</span>                        <span class="wa">1/2  ██░░░</span>     <span class="wh">│</span>
+<span class="wh">│</span>   <span class="wg">●</span> Прогулка       <span class="wy">🔥  7</span>   •  •  •  <span class="wg">✓</span>         <span class="wh">│</span>
+<span class="wh">│</span>   ○ Без сахара     <span class="wy">🔥  3</span>   ■  ■  ■  ○         <span class="wh">│</span>
+<span class="wh">├─────────────────────────────────────────────────┤</span>
+<span class="wh">│</span> 🌙  <span class="wh">ВЕЧЕР</span>                       <span class="wa">0/2  ░░░░░</span>     <span class="wh">│</span>
+<span class="wh">│</span>   ○ Растяжка       <span class="wy">🔥 14</span>   ·· ·· ·· ○         <span class="wh">│</span>
+<span class="wh">│</span>   ○ Рефлексия      <span class="wy">🔥  1</span>   ·· ·· ·· ○         <span class="wh">│</span>
+<span class="wh">└─────────────────────────────────────────────────┘</span>
+      </div>
+    </div>
+
+    <!-- Power Combo -->
+    <div class="power-combo">
+      <h3>Сильная связка для первой версии</h3>
+      <div class="power-tags">
+        <div class="ptag">Минимализм (1 касание)</div>
+        <span class="plus">+</span>
+        <div class="ptag">GitHub-heatmap</div>
+        <span class="plus">+</span>
+        <div class="ptag">Кольца (неделя)</div>
+        <span class="plus">+</span>
+        <div class="ptag">Streak Freeze</div>
+        <span class="plus">+</span>
+        <div class="ptag">Утро / День / Вечер</div>
+        <span class="plus">+</span>
+        <div class="ptag">Day Score</div>
+      </div>
+      <p style="margin-top:14px;font-size:0.84rem;color:var(--text-muted);">Покрывает все основные психологические механики без перегруза интерфейса.</p>
+    </div>
+
+    <!-- Don't do -->
+    <div class="mt-24">
+      <p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--red);margin-bottom:14px;">Что НЕ делать</p>
+      <ul class="dont-list">
+        <li>Смешивать интерфейс выполнения и аналитики на одном экране</li>
+        <li>Делать жёсткий стрик без grace period / freeze</li>
+        <li>Показывать более 8 привычек без фильтрации</li>
+        <li>Использовать обвинительный тон при пропусках</li>
+        <li>Отмечать привычку через модальное окно — только inline</li>
+        <li>Делать геймификацию без механики удержания под ней</li>
+      </ul>
+    </div>
+
+  </section>
+
+</div>
+
+<footer>
+  <p>Источники: Streaks · Habitica · Fabulous · Finch · Strides · HabitBull · Loop · Notion · Duolingo ACM CHI 2019 · BJ Fogg "Tiny Habits" · James Clear "Atomic Habits" · Gollwitzer NYU 1999 · UCL Lally 2010 · JMIR Systematic Review 2024</p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Выбор фич: Блок привычек</title>
+  <style>
+    :root {
+      --bg: #f5f4f0;
+      --bg2: #ffffff;
+      --bg3: #f0eeea;
+      --border: #e5e2da;
+      --text: #1a1917;
+      --text-muted: #7a7570;
+      --text-light: #a09a94;
+      --accent: #6b5cf5;
+      --accent2: #14b89a;
+      --green: #16a34a;
+      --green-bg: #f0fdf4;
+      --green-border: #bbf7d0;
+      --red: #dc2626;
+      --red-bg: #fff1f2;
+      --red-border: #fecdd3;
+      --maybe: #d97706;
+      --maybe-bg: #fffbeb;
+      --maybe-border: #fde68a;
+      --shadow: 0 2px 12px rgba(0,0,0,0.06);
+      --shadow-hover: 0 6px 24px rgba(0,0,0,0.1);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-size: 15px;
+      line-height: 1.65;
+      padding-bottom: 100px;
+    }
+
+    /* USER BANNER */
+    .user-banner {
+      background: linear-gradient(135deg, #2d1f7a, #4c3bcf);
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 0.85rem;
+    }
+    .user-banner .who {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .user-avatar {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700;
+      flex-shrink: 0;
+    }
+    .user-name { font-weight: 700; }
+    .user-status { font-size: 0.75rem; color: rgba(255,255,255,0.65); }
+    .save-btn-top {
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: white;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .save-btn-top:hover { background: rgba(255,255,255,0.3); }
+
+    /* HERO */
+    .hero {
+      background: linear-gradient(135deg, #2d1f7a 0%, #4c3bcf 40%, #6b5cf5 70%, #8b7cf8 100%);
+      padding: 40px 24px 36px;
+      text-align: center;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero h1 { font-size: 2rem; font-weight: 800; margin-bottom: 10px; letter-spacing: -0.02em; }
+    .hero p { font-size: 0.95rem; color: rgba(255,255,255,0.75); max-width: 520px; margin: 0 auto 18px; line-height: 1.6; }
+    .hero .instructions { display: inline-flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+    .hero .instructions .inst { display: flex; align-items: center; gap: 7px; font-size: 0.82rem; color: rgba(255,255,255,0.8); }
+    .inst-dot { width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; }
+    .inst-dot.want { background: var(--green-bg); color: var(--green); }
+    .inst-dot.skip { background: var(--red-bg); color: var(--red); }
+    .inst-dot.maybe { background: var(--maybe-bg); color: var(--maybe); }
+
+    /* PROGRESS */
+    .progress-bar-wrap {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .progress-bar-inner { max-width: 900px; margin: 0 auto; display: flex; align-items: center; gap: 14px; }
+    .progress-label { font-size: 0.78rem; font-weight: 600; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
+    .progress-track { flex: 1; height: 7px; background: var(--bg3); border-radius: 4px; overflow: hidden; min-width: 40px; }
+    .progress-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 0.4s ease; width: 0%; }
+    .progress-counts { display: flex; gap: 8px; flex-shrink: 0; }
+    .count-chip { font-size: 0.75rem; font-weight: 700; padding: 3px 8px; border-radius: 12px; }
+    .count-chip.want { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+    .count-chip.skip { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
+    .count-chip.maybe { background: var(--maybe-bg); color: var(--maybe); border: 1px solid var(--maybe-border); }
+
+    /* LAYOUT */
+    .container { max-width: 900px; margin: 0 auto; padding: 0 16px; }
+    .section { margin-top: 40px; }
+    .section-title-wrap { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; flex-wrap: wrap; }
+    .tier-badge { display: inline-flex; align-items: center; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; padding: 4px 12px; border-radius: 20px; flex-shrink: 0; }
+    .tier-must { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+    .tier-high  { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+    .tier-adv   { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+    .tier-ux    { background: #fdf4ff; color: #7c3aed; border: 1px solid #e9d5ff; }
+    .section h2 { font-size: 1.25rem; font-weight: 800; color: var(--text); }
+    .section-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px; }
+    .click-hint { font-size: 0.7rem; color: var(--text-light); margin-top: 8px; font-style: italic; }
+    .divider { height: 1px; background: var(--border); margin: 44px 0; }
+
+    /* CARDS */
+    .feat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+    .feat-card {
+      background: var(--bg2); border: 2px solid var(--border); border-radius: 14px;
+      padding: 16px 16px 14px; cursor: pointer; transition: all 0.18s ease;
+      position: relative; user-select: none; box-shadow: var(--shadow);
+      -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+    }
+    .feat-card:active { transform: scale(0.98); }
+    @media (hover: hover) { .feat-card:hover { border-color: var(--accent); box-shadow: var(--shadow-hover); transform: translateY(-1px); } }
+    .feat-card.want { border-color: var(--green); background: var(--green-bg); }
+    .feat-card.skip { border-color: var(--red); background: var(--red-bg); opacity: 0.72; }
+    .feat-card.maybe { border-color: var(--maybe); background: var(--maybe-bg); }
+    .feat-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+    .feat-name { font-size: 0.9rem; font-weight: 700; color: var(--text); line-height: 1.4; flex: 1; }
+    .feat-card.want .feat-name { color: var(--green); }
+    .feat-card.skip .feat-name { color: var(--red); }
+    .feat-card.maybe .feat-name { color: var(--maybe); }
+    .feat-top-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .feat-status { font-size: 0.9rem; width: 26px; height: 26px; border-radius: 7px; display: flex; align-items: center; justify-content: center; background: var(--bg3); transition: all 0.18s; }
+    .feat-card.want .feat-status { background: rgba(22,163,74,0.15); }
+    .feat-card.skip .feat-status { background: rgba(220,38,38,0.12); }
+    .feat-card.maybe .feat-status { background: rgba(217,119,6,0.15); }
+    .info-btn { width: 22px; height: 22px; border-radius: 50%; background: var(--bg3); border: 1px solid var(--border); color: var(--text-muted); font-size: 0.7rem; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: all 0.15s; position: relative; z-index: 2; }
+    .info-btn:hover { background: var(--accent); color: white; border-color: var(--accent); }
+    .feat-card.want .info-btn { background: rgba(22,163,74,0.1); border-color: var(--green-border); color: var(--green); }
+    .feat-card.skip .info-btn { background: rgba(220,38,38,0.08); border-color: var(--red-border); color: var(--red); }
+    .feat-card.maybe .info-btn { background: rgba(217,119,6,0.1); border-color: var(--maybe-border); color: var(--maybe); }
+    .feat-desc { font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; }
+    .feat-card.want .feat-desc { color: #166534; }
+    .feat-card.skip .feat-desc { color: #991b1b; }
+    .feat-card.maybe .feat-desc { color: #92400e; }
+    .feat-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+    .feat-tag { font-size: 0.65rem; font-weight: 600; padding: 2px 6px; border-radius: 8px; background: var(--bg3); color: var(--text-muted); border: 1px solid var(--border); }
+    .feat-card.want .feat-tag { background: rgba(22,163,74,0.1); color: #166534; border-color: var(--green-border); }
+    .feat-card.skip .feat-tag { background: rgba(220,38,38,0.08); color: #991b1b; border-color: var(--red-border); }
+    .feat-card.maybe .feat-tag { background: rgba(217,119,6,0.1); color: #92400e; border-color: var(--maybe-border); }
+
+    /* DETAIL MODAL */
+    .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 400; align-items: flex-end; justify-content: center; }
+    .overlay.open { display: flex; }
+    @media (min-width: 640px) { .overlay { align-items: center; padding: 24px; } }
+    .sheet {
+      background: white; border-radius: 20px 20px 0 0;
+      padding: 28px 24px 32px; width: 100%; max-height: 80vh;
+      overflow-y: auto; box-shadow: 0 -8px 40px rgba(0,0,0,0.15);
+      position: relative; animation: slideUp 0.22s ease;
+    }
+    @media (min-width: 640px) { .sheet { border-radius: 20px; max-width: 560px; animation: fadeIn 0.18s ease; } }
+    @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes fadeIn { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
+    .sheet-close { position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; border-radius: 50%; background: var(--bg3); border: none; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
+    .detail-tier { display: inline-block; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 3px 10px; border-radius: 12px; margin-bottom: 10px; }
+    .detail-title { font-size: 1.2rem; font-weight: 800; color: var(--text); margin-bottom: 14px; line-height: 1.3; padding-right: 32px; }
+    .detail-short { font-size: 0.9rem; color: var(--text); line-height: 1.65; margin-bottom: 14px; }
+    .detail-long { font-size: 0.86rem; color: var(--text-muted); line-height: 1.7; padding: 14px 16px; background: var(--bg3); border-radius: 10px; margin-bottom: 14px; }
+    .detail-long strong { color: var(--text); }
+    .detail-science { font-size: 0.82rem; color: var(--text-muted); background: rgba(107,92,245,0.06); border: 1px solid rgba(107,92,245,0.15); border-radius: 10px; padding: 10px 14px; margin-bottom: 16px; }
+    .detail-why { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); margin-bottom: 6px; }
+    .detail-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+    .detail-actions { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .detail-btn { padding: 12px 8px; border-radius: 12px; border: 2px solid var(--border); background: var(--bg3); font-size: 0.82rem; font-weight: 700; cursor: pointer; text-align: center; transition: all 0.15s; font-family: inherit; color: var(--text); }
+    .detail-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(107,92,245,0.06); }
+    .detail-btn.active-want { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+    .detail-btn.active-maybe { background: var(--maybe-bg); border-color: var(--maybe); color: var(--maybe); }
+    .detail-btn.active-skip { background: var(--red-bg); border-color: var(--red); color: var(--red); }
+
+    /* BOTTOM PANEL */
+    .summary-panel { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid var(--border); padding: 12px 16px; z-index: 200; box-shadow: 0 -4px 20px rgba(0,0,0,0.08); }
+    .summary-inner { max-width: 900px; margin: 0 auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .summary-chips { display: flex; gap: 8px; flex: 1; flex-wrap: wrap; }
+    .summary-btns { display: flex; gap: 8px; flex-shrink: 0; }
+    .btn { font-size: 0.8rem; font-weight: 700; padding: 9px 16px; border-radius: 10px; border: none; cursor: pointer; transition: all 0.15s; font-family: inherit; white-space: nowrap; }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary:hover { background: #5a4be0; }
+    .btn-secondary { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: var(--border); }
+    .btn-save { background: var(--green); color: white; }
+    .btn-save:hover { background: #15803d; }
+
+    /* SAVE SUCCESS TOAST */
+    .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #1a1917; color: white; padding: 12px 20px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; z-index: 999; display: none; box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+    .toast.show { display: block; animation: toastIn 0.2s ease; }
+    @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(-10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+
+    /* RESULT MODAL */
+    .result-sheet { background: white; border-radius: 20px 20px 0 0; padding: 28px 24px 32px; width: 100%; max-height: 85vh; overflow-y: auto; box-shadow: 0 -8px 40px rgba(0,0,0,0.15); animation: slideUp 0.22s ease; position: relative; }
+    @media (min-width: 640px) { .result-sheet { border-radius: 20px; max-width: 640px; animation: fadeIn 0.18s ease; } }
+    .result-sheet h2 { font-size: 1.3rem; font-weight: 800; margin-bottom: 4px; }
+    .result-sub { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px; }
+    .result-section { margin-bottom: 18px; }
+    .result-section-title { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .result-list { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+    .result-list li { display: flex; align-items: flex-start; gap: 8px; font-size: 0.87rem; padding: 8px 12px; border-radius: 8px; background: var(--bg3); line-height: 1.4; }
+    .result-list.want li { background: var(--green-bg); }
+    .result-list.maybe li { background: var(--maybe-bg); }
+    .result-list.want li::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; }
+    .result-list.maybe li::before { content: '?'; color: var(--maybe); font-weight: 700; flex-shrink: 0; }
+    .result-empty { color: var(--text-muted); font-size: 0.87rem; font-style: italic; }
+    .result-footer { margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end; align-items: center; flex-wrap: wrap; }
+    .copy-ok { color: var(--green); font-size: 0.82rem; font-weight: 600; display: none; }
+    .copy-ok.show { display: block; }
+
+    @media (max-width: 480px) {
+      .hero h1 { font-size: 1.6rem; }
+      .feat-grid { grid-template-columns: 1fr; gap: 8px; }
+      .summary-chips { display: none; }
+      .summary-btns { width: 100%; justify-content: stretch; }
+      .summary-btns .btn { flex: 1; font-size: 0.75rem; padding: 10px 6px; }
+      .progress-label { display: none; }
+    }
+
+    @keyframes pop { 0% { transform: scale(1); } 40% { transform: scale(1.03); } 100% { transform: scale(1); } }
+    .feat-card.pop { animation: pop 0.22s ease; }
+  </style>
+</head>
+<body>
+
+<script>
+// Determine current user from URL
+const urlParams = new URLSearchParams(location.search);
+const CURRENT_USER = urlParams.get('user') || '';
+const VIEW_RESULTS = urlParams.get('view') === 'results';
+
+const USERS = {
+  katya:  { name: 'Катя',   color: '#ec4899', bg: '#fdf2f8', emoji: '💙' },
+  ksusha: { name: 'Ксюша',  color: '#8b5cf6', bg: '#f5f3ff', emoji: '💜' },
+  andrey: { name: 'Андрей', color: '#0ea5e9', bg: '#f0f9ff', emoji: '💚' },
+};
+
+// If no user and not results view — redirect to login
+if (!CURRENT_USER && !VIEW_RESULTS) {
+  document.write(`
+    <!DOCTYPE html><html lang="ru"><head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Выбор фич</title>
+    <style>
+      body { font-family: system-ui, sans-serif; background: #f5f4f0; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 24px; box-sizing: border-box; }
+      .box { background: white; border-radius: 20px; padding: 36px 32px; max-width: 380px; width: 100%; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
+      h1 { font-size: 1.5rem; font-weight: 800; margin-bottom: 8px; }
+      p { color: #7a7570; font-size: 0.9rem; margin-bottom: 28px; }
+      .user-btns { display: flex; flex-direction: column; gap: 12px; }
+      .user-btn { padding: 14px 20px; border-radius: 14px; border: 2px solid #e5e2da; background: white; font-size: 1rem; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.15s; display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; }
+      .user-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+      .emoji { font-size: 1.4rem; }
+      .divider { height: 1px; background: #e5e2da; margin: 20px 0; }
+      .results-link { color: #6b5cf5; font-size: 0.85rem; font-weight: 600; text-decoration: none; }
+    </style></head><body>
+    <div class="box">
+      <h1>Кто выбирает?</h1>
+      <p>Каждый выбирает независимо, потом сравним результаты</p>
+      <div class="user-btns">
+        <a href="?user=katya" class="user-btn" style="border-color:#ec4899"><span class="emoji">💙</span><span>Катя</span></a>
+        <a href="?user=ksusha" class="user-btn" style="border-color:#8b5cf6"><span class="emoji">💜</span><span>Ксюша</span></a>
+        <a href="?user=andrey" class="user-btn" style="border-color:#0ea5e9"><span class="emoji">💚</span><span>Андрей</span></a>
+      </div>
+      <div class="divider"></div>
+      <a href="?view=results" class="results-link">📊 Посмотреть общие результаты →</a>
+    </div>
+    </body></html>
+  `);
+  document.close();
+}
+</script>
+
+<!-- User Banner (only shown for named users) -->
+<div class="user-banner" id="userBanner" style="display:none">
+  <div class="who">
+    <div class="user-avatar" id="userAvatar"></div>
+    <div>
+      <div class="user-name" id="userName"></div>
+      <div class="user-status" id="userStatus">Загрузка сохранённых данных...</div>
+    </div>
+  </div>
+  <button class="save-btn-top" onclick="saveSelections()">💾 Сохранить выбор</button>
+</div>
+
+<div class="hero">
+  <h1>Выбери свои фичи</h1>
+  <p>Нажимай на карточки — выбирай что хочешь. Нажми <strong>i</strong> для подробностей о фиче.</p>
+  <div class="instructions">
+    <div class="inst"><div class="inst-dot want">✓</div> Хочу</div>
+    <div class="inst"><div class="inst-dot maybe">?</div> Под вопросом</div>
+    <div class="inst"><div class="inst-dot skip">✕</div> Не нужно</div>
+  </div>
+</div>
+
+<div class="progress-bar-wrap">
+  <div class="progress-bar-inner">
+    <span class="progress-label">Выбрано</span>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-counts">
+      <span class="count-chip want" id="countWant">✓ 0</span>
+      <span class="count-chip maybe" id="countMaybe">? 0</span>
+      <span class="count-chip skip" id="countSkip">✕ 0</span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <section class="section">
+    <div class="section-title-wrap"><span class="tier-badge tier-must">Must-Have</span><h2>Основа — без этого не работает</h2></div>
+    <p class="section-desc">Доказанные механики с самой сильной научной базой.</p>
+    <div class="feat-grid" id="grid-must"></div>
+    <p class="click-hint">нажми на карточку: 1 раз — хочу · 2 раза — под вопросом · 3 раза — не нужно · 4 раза — сброс · кнопка i — подробности</p>
+  </section>
+  <div class="divider"></div>
+  <section class="section">
+    <div class="section-title-wrap"><span class="tier-badge tier-high">High-Value</span><h2>Хорошие фичи с доказательной базой</h2></div>
+    <p class="section-desc">Не обязательны с первого дня, но значительно улучшают опыт.</p>
+    <div class="feat-grid" id="grid-high"></div>
+  </section>
+  <div class="divider"></div>
+  <section class="section">
+    <div class="section-title-wrap"><span class="tier-badge tier-adv">Advanced</span><h2>Продвинутые механики</h2></div>
+    <p class="section-desc">Инновационный край — для тех, кто хочет больше.</p>
+    <div class="feat-grid" id="grid-adv"></div>
+  </section>
+  <div class="divider"></div>
+  <section class="section">
+    <div class="section-title-wrap"><span class="tier-badge tier-ux">Визуал / UX</span><h2>Как это должно выглядеть</h2></div>
+    <p class="section-desc">Паттерны отображения — влияют на мотивацию не меньше, чем сами фичи.</p>
+    <div class="feat-grid" id="grid-ux"></div>
+  </section>
+</div>
+
+<!-- BOTTOM PANEL -->
+<div class="summary-panel">
+  <div class="summary-inner">
+    <div class="summary-chips">
+      <span class="count-chip want" id="bottomWant">✓ 0 хочу</span>
+      <span class="count-chip maybe" id="bottomMaybe">? 0 под вопросом</span>
+    </div>
+    <div class="summary-btns">
+      <button class="btn btn-secondary" onclick="openResult()">Мой список</button>
+      <button class="btn btn-save" onclick="saveSelections()">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL OVERLAY -->
+<div class="overlay" id="detailOverlay">
+  <div class="sheet" id="detailSheet">
+    <button class="sheet-close" onclick="closeDetail()">✕</button>
+    <div id="detailContent"></div>
+    <div class="detail-actions" id="detailActions"></div>
+  </div>
+</div>
+
+<!-- RESULT OVERLAY -->
+<div class="overlay" id="resultOverlay">
+  <div class="result-sheet">
+    <button class="sheet-close" onclick="closeResult()">✕</button>
+    <h2>Мой список</h2>
+    <p class="result-sub">Нажми «Сохранить» чтобы зафиксировать выбор для общих результатов</p>
+    <div id="resultContent"></div>
+    <div class="result-footer">
+      <span class="copy-ok" id="copyOk">✓ Скопировано!</span>
+      <button class="btn btn-secondary" onclick="closeResult()">Закрыть</button>
+      <button class="btn btn-save" onclick="saveSelections()">Сохранить выбор</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const FEATURES = {
+  must: [
+    { name: "Два типа привычек", desc: "Да/Нет и числовые — например «не менее 2 литров воды».", detail: "Есть два принципиально разных вида привычек. <strong>Бинарные</strong> — просто выполнил или нет: медитировал, лёг до 23:00. <strong>Числовые</strong> — нужно достичь порога: выпить не менее 2 литров, сделать 10 000 шагов, прочитать не менее 10 страниц.", why: "Один тип не работает для всех целей — нужен выбор формата при создании.", science: null, tags: ["Базовая механика"] },
+    { name: "Habit Score вместо жёсткого стрика", desc: "Оценка 0–100%. Пропуск не обнуляет — лишь немного ослабляет.", detail: "Habit Score — алгоритм экспоненциального сглаживания из приложения Loop. Каждый день показатель немного растёт при выполнении и немного падает при пропуске. Пропуск одного дня после месяца регулярных выполнений снижает счёт всего на несколько процентов — а не обнуляет, как обычный стрик.", why: "Жёсткий стрик вызывает «what-the-hell effect»: один пропуск — и человек бросает всё.", science: "UCL, Lally 2010: привычка формируется в среднем за 66 дней. Один пропуск не разрушает результат — важна общая система.", tags: ["Психология", "Удержание"] },
+    { name: "Трёхцветная система дней", desc: "Зелёный = обязательный выполнен. Жёлтый = необязательный. Красный = провал.", detail: "У каждой привычки можно задать расписание: например, «только в будни». Тогда выходные — жёлтые дни: серия не прерывается, даже если не отмечать. Снимает тревогу в выходные.", why: "Без жёлтых дней пользователи воспринимают любой пробел как провал.", science: "HabitBull: три статуса вместо двух повышают долгосрочный retention.", tags: ["Визуал", "Гибкость"] },
+    { name: "Уважительный пропуск (Skip)", desc: "Долгое нажатие = «пропуск по причине» — не влияет на счёт.", detail: "Долгое нажатие на день вместо «выполнено» ставит статус Skip. Это честный сигнал: «сегодня не было возможности» — болезнь, командировка, форс-мажор. Серия и Habit Score не меняются.", why: "Без этой функции люди либо ставят «выполнено» для отчётности, либо бросают трекер.", science: "Loop Habit Tracker: статус Skip — один из самых популярных запросов пользователей.", tags: ["Без вины"] },
+    { name: "Отметка в одно касание", desc: "Выполнить привычку — один тап с главного экрана.", detail: "Чтобы отметить привычку, не нужно открывать детальный экран, подтверждать в модальном окне или делать свайп. Один тап прямо в списке — и готово. Цвет меняется мгновенно.", why: "Каждый лишний шаг — это трение, снижающее вероятность выполнения.", science: "BJ Fogg (Stanford): «Tiny Habits» — упрощение действия критически важно.", tags: ["UX", "Скорость"] },
+    { name: "Анимация при выполнении", desc: "Моментальный отклик — анимация + смена цвета в момент отметки.", detail: "При отметке сразу происходит: смена цвета на зелёный, небольшая анимация и вибрация на телефоне. Всё мгновенно, не через секунду.", why: "Дофамин выделяется в момент ожидания награды — моментальный отклик создаёт этот момент.", science: "Duolingo A/B: анимация при закрытии кольца +1.7% retention на 7-й день.", tags: ["Психология", "Мотивация"] },
+    { name: "Стрик + Лучший стрик", desc: "Текущая серия и рекорд за всё время — отдельно.", detail: "Рядом с текущей серией всегда виден личный рекорд. Если сейчас 5 дней, а рекорд 23 — это мотивирует его побить. При достижении рекорда — особая анимация.", why: "Лучший стрик работает как долгосрочный мотиватор даже когда серия прервалась.", science: "Streaks (Apple Design Award 2016): «Best Streak» как отдельная метрика.", tags: ["Удержание"] },
+    { name: "Never Miss Twice", desc: "Нейтральное, не обвинительное сообщение при пропуске.", detail: "При пропуске не говорится «ты сорвался». Вместо этого нейтральный тон: «Вчера не было отметки — продолжаем?» Принцип: раз — случайность, дважды — начало новой привычки.", why: "Обвинительный тон запускает «what-the-hell effect» — человек думает «всё равно уже сломал» и бросает.", science: "JPSPsych 2020: люди на 63% чаще бросали привычку после первого пропуска с обвинительным фреймингом.", tags: ["Психология", "Без вины"] },
+    { name: "Заметки к дню", desc: "Долгое нажатие на день в календаре = добавить заметку.", detail: "Долгое нажатие на конкретный день открывает поле для заметки. Можно написать: «Пропустил из-за болезни», «Было тяжело», «Лучший день недели». Заметки видны рядом с историей.", why: "Заметки превращают трекер в дневник и помогают выявить паттерны.", science: "HabitBull: Habit Notes — один из самых используемых инструментов.", tags: ["Дневник"] },
+    { name: "Прогресс-бар секции", desc: "«Утро: 3 из 5 выполнено» — видно без подсчёта.", detail: "Каждый временной блок имеет мини-прогресс-бар с числом. Бар заполняется по мере отметки привычек внутри блока.", why: "Прогресс-бар создаёт эффект «незаконченного действия» — хочется довести до 100%.", science: "Cohorty Research: прогресс-бар с мгновенным цветом увеличивает соблюдение привычки на 30%.", tags: ["Обзор дня"] },
+    { name: "Day Score — балл за день", desc: "Процент выполненных привычек за сегодня — один показатель вверху.", detail: "В самом верху экрана — одна цифра: процент выполненных привычек за сегодня. 80% — хороший день. Можно добавить мотивационные сообщения без осуждения.", why: "Агрегированный показатель даёт мгновенный «пульс дня» без подсчёта вручную.", science: "Notion habit templates: Day Score как % — популярная механика.", tags: ["Аналитика"] },
+  ],
+  high: [
+    { name: "Разбивка Утро / День / Вечер", desc: "Привычки в трёх блоках по времени суток.", detail: "Главный экран разделён на три секции с иконками. В каждую привычку при создании выбирается её время. Показываются только актуальные сейчас привычки.", why: "Habit Stacking — новые привычки лучше прикрепляются к уже существующим ритуалам.", science: "BJ Fogg (Stanford): «Tiny Habits» — якорное поведение ключ к формированию устойчивой привычки.", tags: ["Habit Stacking", "UX"] },
+    { name: "Негативные привычки", desc: "«Не есть сахар» — прогресс-бар начинается полным и убывает.", detail: "Для вредных привычек логика инвертируется: бар начинается со 100%. Если сдался — убывает. Устоял — день закрывается с полным баром. Примеры: «не курить», «не есть после 21:00».", why: "Обычный трекер не умеет работать с «не делать».", science: "Strides (iOS): «Bad Habit Mode» — специальный режим для негативных привычек.", tags: ["Отказ от вредного"] },
+    { name: "Pace Line — «ты на треке?»", desc: "Для привычек с целью к дате: где должен быть сейчас.", detail: "Если привычка привязана к цели с дедлайном, система считает плановый темп. Зелёный = опережаешь. Красный = отстаёшь.", why: "Превращает абстрактную цель в ежедневный конкретный ориентир.", science: "Strides: «Projected Trend Line» — экстраполяция текущего темпа.", tags: ["Цели к дате"] },
+    { name: "Streak Freeze — заморозка серии", desc: "1–2 «заморозки» в запасе. Один пропуск не обнуляет серию.", detail: "Как в Duolingo: 1–2 «заморозки», которые автоматически активируются при пропуске. Серия продолжается как будто пропуска не было. Восстанавливаются после нескольких активных дней.", why: "Знание, что есть «защита», снижает тревожность и повышает долгосрочное использование.", science: "ACM CHI 2019: Streak Freeze даёт +14% retention на 14-й день.", tags: ["Удержание", "Психология"] },
+    { name: "Гибкий стрик «N из 7 дней»", desc: "Серия продолжается если выполнил N дней в неделю.", detail: "Для привычек не на каждый день можно задать частоту: «5 из 7 дней» или «3 раза в неделю». Серия продолжается пока выполняется минимум.", why: "Жёсткий ежедневный стрик не подходит для большинства здоровых привычек.", science: "Strides: гибкие расписания — ключевая фича.", tags: ["Гибкость"] },
+    { name: "Процент за 30 дней", desc: "«80% за последние 30 дней» — честная метрика.", detail: "Рядом со стриком показывается % за 30 дней. Стрик = 0 (прервался), но 30-дневный процент 83% — это хороший результат.", why: "Стрик бинарен и жесток: один пропуск = ноль. Процент за 30 дней не наказывает за единичный сбой.", science: "HabitBull: составная метрика из серий + % успешности.", tags: ["Аналитика"] },
+    { name: "Редактирование прошлых дней", desc: "Тап на прошедшую дату = изменить отметку.", detail: "В мини-календаре можно тапнуть на любой прошедший день и изменить статус. Без этого — если забыл отметить вечером, утром уже ничего не исправить.", why: "Люди забывают отмечать, особенно в начале. Без ретроактивного логирования теряют реальный прогресс.", science: "Один из самых часто запрашиваемых функционалов в отзывах на все трекеры.", tags: ["Удобство"] },
+    { name: "Теги / категории", desc: "Группировка привычек по сфере жизни.", detail: "При создании привычки выбирается категория: Здоровье, Работа, Отношения. Можно фильтровать и смотреть аналитику по каждой сфере.", why: "С ростом количества привычек список хаотичен. Теги дают структуру.", science: "Strides: Tags + Reports по тегу — ключевая фича для продвинутых.", tags: ["Организация"] },
+    { name: "Milestone-анимации", desc: "Особые анимации на 7, 14, 30, 100, 365 дней серии.", detail: "На ключевые отметки — особая анимация: конфетти, разворачивающийся баннер. На экране появляется поздравление: «100 дней медитации — это впечатляет».", why: "Milestone-анимации создают «моменты», которые хочется пережить снова.", science: "Goal-Gradient Effect: эйфория достижения промежуточной цели даёт новый импульс.", tags: ["Геймификация"] },
+    { name: "Мотивационные сообщения по уровню дня", desc: "Разный текст при >80% или <40% выполнения — без осуждения.", detail: "При >80%: «Сильный день». При 40–80%: «День не потерян». При <40%: «Бывает — завтра начнём». Тон всегда нейтральный или поддерживающий.", why: "Контекстуальные сообщения делают приложение живым.", science: "Fabulous (Duke BEL): narrative coaching — ключевая механика вовлечения.", tags: ["Поддержка"] },
+    { name: "Автоматический цвет по истории", desc: "Цвет привычки меняется сам: серый → зелёный → красный.", detail: "Цвет иконки привычки автоматически меняется: новая — серый, регулярная — зелёная, с пропусками — желтеет, много пропусков — краснеет.", why: "Один взгляд — видно «здоровье» каждой привычки без анализа статистики.", science: "Habitica: Task Value Color System.", tags: ["Визуал"] },
+    { name: "Habit Stacking — визуальная цепочка", desc: "Привычки в рутине выстроены как цепочка.", detail: "В блоке «Утренняя рутина» привычки отображаются цепочкой: проснулся → вода → медитация → зарядка. После отметки одной — следующая подсвечивается.", why: "Habit Stacking — самый эффективный способ формирования новых привычек.", science: "BJ Fogg: «После [якоря] я сделаю [новое]».", tags: ["Habit Stacking"] },
+    { name: "Подзадачи внутри привычки", desc: "«Утренняя рутина» с чеклистом внутри.", detail: "Сложная привычка содержит чеклист подшагов. «Утренняя рутина»: ✓ Вода, ✓ Растяжка, ✓ Холодный душ. Выполнена при закрытии нужного % подшагов.", why: "Позволяет трекать сложные ритуалы как одну привычку.", science: "Habitica: Checklists внутри Dailies — популярная функция.", tags: ["Детализация"] },
+    { name: "Персональные награды", desc: "Зарабатывай очки → разблокируй свою награду.", detail: "Пользователь сам создаёт список наград: «50 очков → посмотреть серию», «500 очков → купить кроссовки». Очки начисляются за выполнение.", why: "Замыкает петлю привычки на реальные ценные награды.", science: "Habitica: Custom Rewards — один из самых любимых механизмов.", tags: ["Геймификация"] },
+  ],
+  adv: [
+    { name: "Target Tracker — цель к дате", desc: "«24 книги к 31 декабря» → автоматический расчёт темпа.", detail: "Вводишь цель (число) и дедлайн. Система каждый день считает сколько нужно сделать сегодня. При вводе прогресса — обновляет темп.", why: "Превращает годовые цели в конкретные ежедневные действия.", science: "Strides: Target Tracker с Projected Trend Line.", tags: ["Долгосрочные цели"] },
+    { name: "Average Tracker — скользящее среднее", desc: "Среднее значение без жёсткой ежедневной цели.", detail: "Для метрик без ежедневной нормы: средний сон за неделю, среднее настроение за месяц. Нет «провала» если в какой-то день показатель ниже.", why: "Жёсткая ежедневная цель создаёт стресс там где его не должно быть.", science: "Strides: Average Tracker — отдельный тип для метрик с естественной вариацией.", tags: ["Мягкая аналитика"] },
+    { name: "Implementation Intentions при создании", desc: "При добавлении привычки: «когда, где, после чего?»", detail: "Система спрашивает: «Когда будешь это делать? После чего? Где?» Превращает «хочу медитировать» в «После кофе, до 9:00, в гостиной».", why: "Без конкретного намерения привычка остаётся абстрактным желанием.", science: "Gollwitzer (NYU, 1999): цели с implementation intentions выполняются в 2–3× чаще.", tags: ["Психология", "Наука"] },
+    { name: "Нарративный фрейм по месяцам", desc: "Каждый месяц = «глава»: «Апрель: глава про дисциплину».", detail: "В начале месяца задаётся тема. История отображается как главы книги. В конце месяца — автоматическое резюме.", why: "Нарративный фрейм делает жизнь историей, которую человек пишет сам.", science: "Fabulous (Duke BEL): narrative coaching. Identity-based habits по Джеймсу Клиру.", tags: ["Мотивация", "Идентичность"] },
+    { name: "Partner Accountability — партнёр", desc: "Взаимные уведомления, общий стрик с другим пользователем.", detail: "Добавляешь «партнёра по ответственности» — он видит твои привычки, получает уведомление при пропуске. Общий стрик без конкуренции — только поддержка.", why: "Социальная подотчётность — сильнейший внешний мотиватор.", science: "ASTD: 65% вероятность цели с партнёром, 95% при регулярных check-in'ах.", tags: ["Социальное", "Наука"] },
+    { name: "Паттерны по дням недели", desc: "В какой день недели чаще выполняется привычка.", detail: "График: в какие дни недели привычка выполнялась чаще всего за 3 месяца. Например: зарядка — понедельник и среда сильнейшие, пятница — слабейший.", why: "Большинство людей не замечают своих паттернов. Увидев слабый день — могут осознанно поставить Freeze.", science: "Streaks (Apple): паттерны по дням недели — ключевая аналитическая фича.", tags: ["Аналитика", "Инсайты"] },
+    { name: "Паттерны по времени суток", desc: "В какое время обычно закрывается эта привычка.", detail: "Аналитика: в какие часы чаще всего ставится отметка. Если медитация закрывается в среднем в 8:10, а напоминание стоит на 7:30 — стоит сдвинуть.", why: "Помогает оптимизировать напоминания под реальный ритм.", science: "Streaks: Time-of-day patterns.", tags: ["Аналитика"] },
+    { name: "Сезонные сбросы и обновления", desc: "Ежемесячное визуальное обновление — другая тема, цвет.", detail: "Раз в месяц интерфейс получает небольшое обновление: другая цветовая тема, сезонные элементы. Создаёт ощущение нового начала.", why: "Одна и та же среда через месяцы становится незаметной — перестаёт стимулировать.", science: "Finch: seasonal events — фактор удержания.", tags: ["Вовлечённость"] },
+    { name: "Микропромпт при отметке", desc: "После выполнения — «что заметил?» Раз в неделю.", detail: "Иногда при отметке появляется микровопрос: «Что заметил сегодня?» Ответ — одна-две фразы. Копится в дневнике привычки.", why: "Рефлексия закрепляет нейронный путь.", science: "BJ Fogg: celebration и reflection — финальный элемент «Tiny Habits».", tags: ["Рефлексия"] },
+    { name: "Лимит активных привычек", desc: "Рекомендация ≤3 новых. Новые разблокируются после 30+ дней.", detail: "При онбординге система рекомендует начать с 1–3 привычек. После 30 дней выполнения — «разблокируются» новые слоты.", why: "Самоконтроль — исчерпаемый ресурс. Слишком много сразу = перегруз = отказ.", science: "UCL Lally 2010: 66 дней среднее формирование. Баумайстер: ego depletion.", tags: ["Онбординг"] },
+    { name: "Виджет с суммарным показателем", desc: "Один виджет на рабочий стол с баллом дня.", detail: "Виджет на рабочий стол: одно большое число (Day Score) и 3–5 иконок привычек со статусом. Не нужно открывать приложение.", why: "Виджет — визуальный «якорь»: разблокируя телефон, видишь напоминание.", science: "Finch: Living Widget — точка контакта без push-уведомлений.", tags: ["Виджет"] },
+    { name: "Финансовый залог", desc: "Опция: привязать деньги. Пропуск = реальный штраф.", detail: "Опциональная механика для серьёзных намерений: указываешь сумму залога. При пропуске — списывается на благотворительность. Только для тех, кто сам хочет.", why: "Потеря реальных денег ощущается в 2× сильнее, чем эквивалентное приобретение.", science: "Beeminder: пользователи с залогом имеют кратно более высокий % выполнения.", tags: ["Серьёзный уровень"] },
+  ],
+  ux: [
+    { name: "GitHub Heatmap — карта активности", desc: "Сетка 52×7 за год. Цвет = активность. Самый читаемый формат.", detail: "52 колонки × 7 строк. Каждая ячейка — один день. Цвет: серый = нет данных, тёмно-зелёный = высокая активность. Сразу виден любой паттерн.", why: "Самый информационно ёмкий способ показать год активности на одном экране.", science: "Duolingo: glow-эффект + пламя на серии 7+ дней = ×2.4 возвраты.", tags: ["Визуал", "Аналитика"] },
+    { name: "Прогресс-кольца (Activity Rings)", desc: "Каждая привычка = кольцо. Незакрытое создаёт «ментальный зуд».", detail: "Каждая привычка — кольцо, заполняется по мере прогресса. При закрытии кольца — анимация «взрыва». На главном экране видны все кольца сразу.", why: "Принцип Гештальта: незавершённая форма создаёт психологическое напряжение.", science: "Принцип «Открытой задачи» (Зейгарник): незавершённое тянет к завершению сильнее.", tags: ["Визуал", "Психология"] },
+    { name: "Streak Counter с огнём", desc: "Большое число + иконка огня. Цвет по накалу серии.", detail: "Число дней серии — крупно, с иконкой огня. Цвет: 1–6 дней — жёлтый, 7–29 — оранжевый, 30+ — красный с пульсацией.", why: "Визуальный нарастающий накал создаёт ощущение «ценности» серии.", science: "Серия 7 дней: +140% вероятность вернуться завтра (Duolingo).", tags: ["Визуал", "Мотивация"] },
+    { name: "Недельный обзор", desc: "7 ячеек × привычка. Идеально при 5–8 привычках.", detail: "В строке каждой привычки справа — 7 маленьких ячеек на текущую неделю. Зелёная = выполнено, серая = нет. Мгновенно виден паттерн.", why: "Неделя — естественный ритм планирования. 7 ячеек дают контекст без перехода в детали.", science: "Большинство трекеров показывают недельное представление как основное.", tags: ["Обзор", "Неделя"] },
+    { name: "Месячный обзор", desc: "Мини-сетка 4–5 недель. Виден паттерн «середина месяца».", detail: "Мини-календарь на месяц: 4–5 строк по 7 дней. Каждый день — цветная точка. Позволяет увидеть паттерны: «каждую пятницу пропуск».", why: "Месячный обзор выявляет паттерны, которые не видны за неделю.", science: "Пользователи, использующие аналитику, удерживаются на 34% дольше.", tags: ["Обзор", "Аналитика"] },
+    { name: "Цветовой градиент выполнения", desc: "Частичное выполнение = промежуточный оттенок.", detail: "Вместо бинарного «да/нет» — градиент: 0% = серый, 50% = жёлтый, 100% = зелёный. Выпил 1.5 литра из 2 — желтоватый, не красный.", why: "Бинарный подход наказывает за частичный успех. Градиент признаёт прогресс.", science: "Loop: частичное выполнение числовых привычек учитывается в Habit Score.", tags: ["Визуал"] },
+    { name: "Mood + выполнение в одном цвете", desc: "Оттенок = настроение, интенсивность = выполнение.", detail: "При отметке можно выбрать настроение (5 уровней). В heatmap оттенок = настроение, интенсивность = выполнение. Через месяц видна корреляция: «когда делаю зарядку — настроение выше».", why: "Связь между привычками и состоянием — мощный долгосрочный мотиватор.", science: "Behavioral activation therapy: связь действий и эмоций — ключевой принцип КПТ.", tags: ["Настроение", "Корреляции"] },
+    { name: "Вариативные уведомления", desc: "Ротация формулировок — один текст умирает через 2–4 недели.", detail: "Вместо одного текста напоминания — пул из 10–15 разных, которые чередуются случайно. Иногда персональные: «Уже 7 дней подряд — не останавливайся!»", why: "Психология привыкания: один стимул через 2–4 недели перестаёт восприниматься.", science: "Duolingo: вариативные уведомления — ключевой фактор высокого open rate. ×2.3 CTR через 30 дней.", tags: ["Напоминания"] },
+  ]
+};
+
+const states = ['', 'want', 'maybe', 'skip'];
+const stateIcons = { '': '○', 'want': '✓', 'maybe': '?', 'skip': '✕' };
+const tierNames = { must: 'Must-Have', high: 'High-Value', adv: 'Advanced', ux: 'Визуал / UX' };
+const tierClasses = { must: 'tier-must', high: 'tier-high', adv: 'tier-adv', ux: 'tier-ux' };
+const selections = {};
+let currentDetailKey = null;
+const API = '/habit-api';
+
+function getNextState(cur) { return states[(states.indexOf(cur) + 1) % states.length]; }
+
+function renderCard(feat, key, tier) {
+  const state = selections[key] || '';
+  const div = document.createElement('div');
+  div.className = `feat-card${state ? ' ' + state : ''}`;
+  div.dataset.key = key;
+  div.innerHTML = `
+    <div class="feat-card-top">
+      <div class="feat-name">${feat.name}</div>
+      <div class="feat-top-right">
+        <button class="info-btn">i</button>
+        <div class="feat-status">${stateIcons[state]}</div>
+      </div>
+    </div>
+    <div class="feat-desc">${feat.desc}</div>
+    <div class="feat-tags">${feat.tags.map(t => `<span class="feat-tag">${t}</span>`).join('')}</div>
+  `;
+  div.addEventListener('click', (e) => {
+    if (e.target.closest('.info-btn')) return;
+    const next = getNextState(selections[key] || '');
+    selections[key] = next;
+    div.className = `feat-card${next ? ' ' + next : ''} pop`;
+    div.querySelector('.feat-status').textContent = stateIcons[next];
+    setTimeout(() => div.classList.remove('pop'), 300);
+    updateCounts();
+    if (currentDetailKey === key) updateDetailActions();
+  });
+  div.querySelector('.info-btn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    openDetail(key, feat, tier);
+  });
+  return div;
+}
+
+function renderAll() {
+  ['must', 'high', 'adv', 'ux'].forEach(sec => {
+    const grid = document.getElementById('grid-' + sec);
+    if (!grid) return;
+    grid.innerHTML = '';
+    FEATURES[sec].forEach((feat, i) => {
+      const key = `${sec}-${i}`;
+      if (!selections[key]) selections[key] = '';
+      grid.appendChild(renderCard(feat, key, sec));
+    });
+  });
+  updateCounts();
+}
+
+function refreshCards() {
+  document.querySelectorAll('.feat-card').forEach(card => {
+    const key = card.dataset.key;
+    const state = selections[key] || '';
+    card.className = `feat-card${state ? ' ' + state : ''}`;
+    card.querySelector('.feat-status').textContent = stateIcons[state];
+  });
+}
+
+function updateCounts() {
+  let want = 0, maybe = 0, skip = 0, total = 0;
+  Object.values(selections).forEach(s => { total++; if (s === 'want') want++; else if (s === 'maybe') maybe++; else if (s === 'skip') skip++; });
+  document.getElementById('countWant').textContent = `✓ ${want}`;
+  document.getElementById('countMaybe').textContent = `? ${maybe}`;
+  document.getElementById('countSkip').textContent = `✕ ${skip}`;
+  document.getElementById('bottomWant').textContent = `✓ ${want} хочу`;
+  document.getElementById('bottomMaybe').textContent = `? ${maybe} под вопросом`;
+  const decided = want + maybe + skip;
+  document.getElementById('progressFill').style.width = `${Math.round(decided / total * 100)}%`;
+}
+
+function openDetail(key, feat, tier) {
+  currentDetailKey = key;
+  document.getElementById('detailContent').innerHTML = `
+    <span class="detail-tier ${tierClasses[tier]}">${tierNames[tier]}</span>
+    <div class="detail-title">${feat.name}</div>
+    <div class="detail-short">${feat.desc}</div>
+    <div class="detail-long">${feat.detail}</div>
+    ${feat.why ? `<div class="detail-why">Почему это важно</div><div class="detail-science">${feat.why}</div>` : ''}
+    ${feat.science ? `<div class="detail-why">Научная база</div><div class="detail-science">${feat.science}</div>` : ''}
+    <div class="detail-tags">${feat.tags.map(t => `<span class="feat-tag">${t}</span>`).join('')}</div>
+    <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:10px;">Твоё решение:</div>
+  `;
+  updateDetailActions();
+  document.getElementById('detailOverlay').classList.add('open');
+}
+
+function updateDetailActions() {
+  const state = selections[currentDetailKey] || '';
+  document.getElementById('detailActions').innerHTML = `
+    <button class="detail-btn ${state === 'want' ? 'active-want' : ''}" onclick="setFromDetail('want')">✓ Хочу</button>
+    <button class="detail-btn ${state === 'maybe' ? 'active-maybe' : ''}" onclick="setFromDetail('maybe')">? Под вопросом</button>
+    <button class="detail-btn ${state === 'skip' ? 'active-skip' : ''}" onclick="setFromDetail('skip')">✕ Не нужно</button>
+  `;
+}
+
+function setFromDetail(newState) {
+  if (!currentDetailKey) return;
+  const prev = selections[currentDetailKey];
+  selections[currentDetailKey] = prev === newState ? '' : newState;
+  updateDetailActions(); refreshCards(); updateCounts();
+}
+
+function closeDetail() { document.getElementById('detailOverlay').classList.remove('open'); currentDetailKey = null; }
+document.getElementById('detailOverlay').addEventListener('click', function(e) { if (e.target === this) closeDetail(); });
+
+function openResult() {
+  const secNames = { must: 'Must-Have', high: 'High-Value', adv: 'Advanced', ux: 'Визуал / UX' };
+  let html = ''; let hasWant = false;
+  ['must', 'high', 'adv', 'ux'].forEach(sec => {
+    const items = FEATURES[sec].filter((_, i) => selections[`${sec}-${i}`] === 'want');
+    if (items.length) { hasWant = true; html += `<div class="result-section"><div class="result-section-title"><span class="count-chip want">${items.length}</span>${secNames[sec]}</div><ul class="result-list want">${items.map(f => `<li>${f.name}</li>`).join('')}</ul></div>`; }
+  });
+  let maybeItems = [];
+  ['must', 'high', 'adv', 'ux'].forEach(sec => { FEATURES[sec].forEach((f, i) => { if (selections[`${sec}-${i}`] === 'maybe') maybeItems.push(f.name); }); });
+  if (maybeItems.length) html += `<div class="result-section"><div class="result-section-title"><span class="count-chip maybe">${maybeItems.length}</span>Под вопросом</div><ul class="result-list maybe">${maybeItems.map(n => `<li>${n}</li>`).join('')}</ul></div>`;
+  if (!hasWant && !maybeItems.length) html = '<p class="result-empty">Ты ещё ничего не выбрал.</p>';
+  document.getElementById('resultContent').innerHTML = html;
+  document.getElementById('resultOverlay').classList.add('open');
+}
+
+function closeResult() { document.getElementById('resultOverlay').classList.remove('open'); }
+document.getElementById('resultOverlay').addEventListener('click', function(e) { if (e.target === this) closeResult(); });
+
+function showToast(msg, duration = 2500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), duration);
+}
+
+async function saveSelections() {
+  if (!CURRENT_USER) { showToast('Открой ссылку с твоим именем'); return; }
+  try {
+    const resp = await fetch(`${API}/save?user=${CURRENT_USER}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ selections })
+    });
+    if (resp.ok) {
+      showToast(`✓ Выбор ${USERS[CURRENT_USER]?.name || CURRENT_USER} сохранён!`);
+      document.getElementById('userStatus').textContent = 'Сохранено только что';
+    } else { showToast('Ошибка при сохранении'); }
+  } catch (e) { showToast('Ошибка соединения'); }
+}
+
+async function loadUserData() {
+  if (!CURRENT_USER) return;
+  try {
+    const resp = await fetch(`${API}/load?user=${CURRENT_USER}`);
+    const data = await resp.json();
+    if (data.selections) {
+      Object.assign(selections, data.selections);
+      refreshCards(); updateCounts();
+      const saved = data.savedAt ? new Date(data.savedAt).toLocaleString('ru') : null;
+      document.getElementById('userStatus').textContent = saved ? `Последнее сохранение: ${saved}` : 'Выборов ещё нет';
+    } else {
+      document.getElementById('userStatus').textContent = 'Выборов ещё нет — начинай!';
+    }
+  } catch (e) {
+    document.getElementById('userStatus').textContent = 'Ошибка загрузки';
+  }
+}
+
+// Init user banner
+if (CURRENT_USER && USERS[CURRENT_USER]) {
+  const u = USERS[CURRENT_USER];
+  const banner = document.getElementById('userBanner');
+  banner.style.display = 'flex';
+  banner.style.background = `linear-gradient(135deg, ${u.color}dd, ${u.color}aa)`;
+  document.getElementById('userAvatar').textContent = u.emoji;
+  document.getElementById('userAvatar').style.background = 'rgba(255,255,255,0.2)';
+  document.getElementById('userName').textContent = u.name;
+  document.title = `Выбор фич — ${u.name}`;
+  loadUserData();
+}
+
+renderAll();
+</script>
+</body>
+</html>
